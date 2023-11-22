@@ -1,0 +1,49 @@
+{
+  "name": "react-native-agnoplayer",
+  "version": "1.0.0",
+  "description": "React Native AgnoPlayer API for iOS & Android",
+  "main": "index.js",
+  "files": [
+    "/android",
+    "!/android/build",
+    "/ios",
+    "/src",
+    "/lib",
+    "/*.podspec"
+  ],
+  "author": "Hardik Mashru <harrymash2006@gmail.com>",
+  "contributors": [
+    "Hardik Mashru <harrymash2006@gmail.com>"
+  ],
+  "homepage": "https://github.com/",
+  "license": "MIT",
+  "scripts": {
+    "start": "react-native start",
+    "start:android": "cd example && yarn react-native run-android",
+    "start:ios": "cd example && yarn react-native run-ios --project-path `pwd`/ios",
+    "validate:eslint": "eslint \"src/**/*.{js,ts,tsx}\" \"example/**/*.{js,ts,tsx}\"",
+    "validate:typescript": "tsc --project ./ --noEmit"
+  },
+  "keywords": [
+    "react-native",
+    "react native"
+  ],
+  "peerDependencies": {
+    "react-native": ">=0.73",
+    "prop-types": "^15.7.2"
+  },
+  "dependencies": {
+    "deprecated-react-native-prop-types": "^5.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "yarn eslint --fix",
+      "git add"
+    ]
+  }
+}

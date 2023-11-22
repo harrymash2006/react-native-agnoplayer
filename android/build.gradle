@@ -1,0 +1,148 @@
+import com.android.Version
+
+buildscript {
+    // Buildscript is evaluated before everything else so we can't use getExtOrDefault
+    def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Agno_kotlinVersion']
+
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.1.4"
+        // noinspection DifferentKotlinGradleVersion
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'com.android.library'
+//apply plugin: 'kotlin-android'
+
+
+def getExtOrDefault(name, defaultValue) {
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : defaultValue
+}
+
+def supportsNamespace() {
+    def parsed = Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+    def major = parsed[0].toInteger()
+    def minor = parsed[1].toInteger()
+
+    // Namespace support was added in 7.3.0
+    if (major == 7 && minor >= 3) {
+        return true
+    }
+
+    return major >= 8
+}
+
+
+android {
+    if (supportsNamespace()) {
+        namespace 'com.lib.agnoreactnative'
+
+        sourceSets {
+            main {
+                manifest.srcFile "src/main/AndroidManifestNew.xml"
+            }
+        }
+    }
+
+    compileSdkVersion getExtOrDefault('compileSdkVersion', 34)
+    buildToolsVersion getExtOrDefault('buildToolsVersion', "34.0.0")
+
+    def agpVersion = Version.ANDROID_GRADLE_PLUGIN_VERSION
+    if (agpVersion.tokenize('.')[0].toInteger() >= 8) {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
+
+        /*kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }*/
+    }
+
+    defaultConfig {
+        compileSdkVersion getExtOrDefault('compileSdkVersion', 34)
+        minSdk getExtOrDefault('minSdkVersion', 21)
+        targetSdkVersion getExtOrDefault('targetSdkVersion', 34)
+        consumerProguardFiles "consumer-rules.pro"
+        ndk {
+            abiFilters(*reactNativeArchitectures())
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    packagingOptions {
+        exclude "**/libreact_render*.so"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    /*sourceSets.main {
+        java {
+            if (isNewArchitectureEnabled()) {
+                srcDirs += [
+                        "src/fabric/java",
+                        "${project.buildDir}/generated/source/codegen/java"
+                ]
+            } else {
+                srcDirs += [
+                        "src/oldarch/java"
+                ]
+            }
+        }
+    }*/
+}
+
+def reactNativeArchitectures() {
+    def value = project.getProperties().get("reactNativeArchitectures")
+    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+}
+
+repositories {
+    google()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+    mavenCentral()
+    maven {
+        name "GitLab"
+        url "https://gitlab.mediahuisgroup.com/api/v4/projects/1001/packages/maven"
+        credentials(HttpHeaderCredentials) {
+            name "Private-Token"
+            value gitLabPrivateToken
+        }
+
+        authentication { header(HttpHeaderAuthentication)}
+    }
+    maven {
+        url "https://muxinc.jfrog.io/artifactory/default-maven-release-local"
+    }
+}
+
+def kotlin_version = getExtOrDefault('kotlinVersion', "1.8.0")
+dependencies {
+    api "com.facebook.react:react-native:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation("core-services:gemius-sdk:2.0.4@aar") {
+        implementation("core-services:agnoplay-android:3.1.0@aar") {
+            transitive true
+        }
+    }
+}
