@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Platform } from 'react-native';
+import { Platform, requireNativeComponent } from 'react-native';
 import {ViewPropTypes} from 'deprecated-react-native-prop-types';
 
 export default class AgnoPlayerViewModule extends Component {
