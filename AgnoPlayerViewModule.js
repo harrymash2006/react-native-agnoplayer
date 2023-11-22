@@ -11,7 +11,8 @@ export default class AgnoPlayerViewModule extends Component {
         brand: PropTypes.string,
         videoId: PropTypes.string,
         url: PropTypes.string,
-        showAds: PropTypes.bool
+        showAds: PropTypes.bool,
+        playerConfig: PropTypes.object
     }
 
     static defaultProps = {

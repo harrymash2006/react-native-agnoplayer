@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Platform, requireNativeComponent } from 'react-native';
+import { Platform, View, requireNativeComponent } from 'react-native';
 import {ViewPropTypes} from 'deprecated-react-native-prop-types';
 
 export default class AgnoPlayerViewModule extends Component {
@@ -27,9 +27,12 @@ export default class AgnoPlayerViewModule extends Component {
     render() {
         if (Platform.OS === 'android') {
             return(
-                <AgnoPlayerView 
-                {...this.props}
-                />
+                <View style={{ flex:1 }}>
+                    <AgnoPlayerView 
+                    {...this.props}
+                    style={{ flex: 1}}
+                    />
+                </View>
             )
         } else {
             return null

@@ -17,7 +17,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
-//apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android'
 
 
 def getExtOrDefault(name, defaultValue) {
@@ -59,9 +59,9 @@ android {
             targetCompatibility JavaVersion.VERSION_17
         }
 
-        /*kotlinOptions {
+        kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.majorVersion
-        }*/
+        }
     }
 
     defaultConfig {

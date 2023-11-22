@@ -1,5 +1,6 @@
 package com.lib.agnoreactnative;
 
+import android.app.Activity;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -25,10 +26,12 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     private AgnoPlayBridgeModule nativeModule;
     private AgnoPlayerView agnoPlayerView;
     private boolean isInBackground;
+    private Activity currentActivity;
 
     public ReactAgnoPlayView(@NonNull final ThemedReactContext context, AgnoPlayBridgeModule nativeModule) {
         super(context);
         this.nativeModule = nativeModule;
+        this.currentActivity = context.getCurrentActivity();
         createViews();
     }
 
@@ -114,7 +117,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     }
 
     private void stopPlayback() {
-        if (isFullScreen) {
+        if (isFullScreen!=null && isFullScreen) {
             setFullScreen(false);
         }
         releasePlayer();
@@ -130,6 +133,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
 
         agnoPlayerView = new AgnoPlayerView(getContext());
         agnoPlayerView.setLayoutParams(layoutParams);
+        agnoPlayerView.setBackgroundColor(getResources().getColor(com.egeniq.agno.agnoplayer.R.color.red));
         addView(agnoPlayerView, 0, layoutParams);
     }
 
@@ -152,7 +156,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
                 PlayItem playItem = new PlayItem(sessionKey, brand, title, videoId, url, showAds,
                         skipAds, muteOnAutoplay, isFullScreen, playerSkinColor,
                         playButtonBackgroundColor, autoPlay);
-                agnoPlayerView.initialize(playItem);
+                agnoPlayerView.initialize(playItem, currentActivity);
             }
         }
     }
