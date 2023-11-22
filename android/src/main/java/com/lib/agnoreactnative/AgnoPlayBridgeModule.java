@@ -17,11 +17,7 @@ public class AgnoPlayBridgeModule extends ReactContextBaseJavaModule {
     public AgnoPlayBridgeModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        AgnoPlayer.Companion.initialize(Objects.requireNonNull(getCurrentActivity()));
-    }
-
-    public Activity getActivity() {
-        return getCurrentActivity();
+        AgnoPlayer.Companion.initialize(getReactApplicationContext());
     }
 
     public void sendEvent(String name, WritableMap body){
