@@ -1,6 +1,7 @@
 package com.lib.agnoreactnative;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -12,21 +13,16 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     private final String TAG = ReactAgnoPlayView.class.getSimpleName();
     private String sessionKey;
     private String brand;
-    private String title;
     private String videoId;
     private String url;
-    private Boolean showAds;
-    private Boolean isFullScreen;
-    private Boolean autoPlay;
-    private String playerSkinColor;
-    private String playButtonBackgroundColor;
 
-    private Boolean skipAds;
-    private Boolean muteOnAutoplay;
+    private Boolean showAds;
     private AgnoPlayBridgeModule nativeModule;
     private AgnoPlayerView agnoPlayerView;
     private boolean isInBackground;
     private Activity currentActivity;
+
+    private PlayItem playerItem;
 
     public ReactAgnoPlayView(@NonNull final ThemedReactContext context, AgnoPlayBridgeModule nativeModule) {
         super(context);
@@ -40,28 +36,8 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         checkAndInitializePlayer();
     }
 
-    public void setAutoPlay(Boolean autoPlay) {
-        this.autoPlay = autoPlay;
-        checkAndInitializePlayer();
-    }
-
-    public void setMuteOnAutoplay(Boolean muteOnAutoplay) {
-        this.muteOnAutoplay = muteOnAutoplay;
-        checkAndInitializePlayer();
-    }
-
-    public void setPlayButtonBackgroundColor(String playButtonBackgroundColor) {
-        this.playButtonBackgroundColor = playButtonBackgroundColor;
-        checkAndInitializePlayer();
-    }
-
-    public void setPlayerSkinColor(String playerSkinColor) {
-        this.playerSkinColor = playerSkinColor;
-        checkAndInitializePlayer();
-    }
-
-    public void setSkipAds(Boolean skipAds) {
-        this.skipAds = skipAds;
+    public void setPlayerItem(PlayItem playerItem) {
+        this.playerItem = playerItem;
         checkAndInitializePlayer();
     }
 
@@ -70,13 +46,13 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         checkAndInitializePlayer();
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
         checkAndInitializePlayer();
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    public void setUrl(String url) {
+        this.url = url;
         checkAndInitializePlayer();
     }
 
@@ -85,26 +61,16 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         checkAndInitializePlayer();
     }
 
-    public void setFullScreen(Boolean fullScreen) {
-        isFullScreen = fullScreen;
-        checkAndInitializePlayer();
-    }
-    public void setUrl(String url) {
-        this.url = url;
-        checkAndInitializePlayer();
-    }
-
-    public void stop() {
-    }
-
     @Override
     public void onHostResume() {
         isInBackground = false;
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostResume());
     }
 
     @Override
     public void onHostPause() {
         isInBackground = true;
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostPause());
     }
 
     @Override
@@ -117,14 +83,11 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     }
 
     private void stopPlayback() {
-        if (isFullScreen!=null && isFullScreen) {
-            setFullScreen(false);
-        }
         releasePlayer();
     }
 
     private void releasePlayer() {
-
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostDestroy());
     }
     private void createViews() {
         LayoutParams layoutParams = new LayoutParams(
@@ -140,23 +103,24 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        Log.i(TAG, "onAttachedToWindow");
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        Log.i(TAG, "onDetachedFromWindow");
     }
 
     private void checkAndInitializePlayer() {
         if (agnoPlayerView != null) {
-            if (sessionKey!=null && brand!=null && (videoId!=null || url!=null) && showAds!=null/* && title!=null
-                    && muteOnAutoplay!=null && skipAds!=null
-                    && isFullScreen!=null && playerSkinColor!=null && playButtonBackgroundColor!=null
-                    && autoPlay!=null*/){
-                PlayItem playItem = new PlayItem(sessionKey, brand, title, videoId, url, showAds,
-                        skipAds, muteOnAutoplay, isFullScreen, playerSkinColor,
-                        playButtonBackgroundColor, autoPlay);
-                agnoPlayerView.initialize(playItem, currentActivity);
+            if (sessionKey!=null && brand!=null && (videoId!=null || url!=null) && showAds!=null && playerItem!=null){
+                playerItem.setSessionKey(sessionKey);
+                playerItem.setBrand(brand);
+                playerItem.setShowAds(showAds);
+                playerItem.setVideoId(videoId);
+                playerItem.setUrl(url);
+                agnoPlayerView.initialize(playerItem, currentActivity, nativeModule);
             }
         }
     }

@@ -3,6 +3,7 @@ package com.lib.agnoreactnative
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Choreographer
@@ -15,6 +16,9 @@ import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayer
 import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayerFactory
 import com.egeniq.agno.agnoplayer.player.AgnoPlayerStateListener
 import com.egeniq.agno.agnoplayer.player.LogLevel
+import com.facebook.react.bridge.Arguments
+import com.lib.agnoreactnative.util.Constants
+import com.lib.agnoreactnative.util.Environment
 import kotlinx.coroutines.launch
 
 
@@ -24,6 +28,7 @@ class AgnoPlayerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr), AgnoErrorListener, AgnoPlayerStateListener {
 
+    private var nativeModule: AgnoPlayBridgeModule? = null
     private val coroutineScope = CustomViewCoroutineScope()
     private var context: Context = context
     private var agnoPlayerView: com.egeniq.agno.agnoplayer.player.ui.AgnoPlayerView
@@ -59,7 +64,13 @@ class AgnoPlayerView @JvmOverloads constructor(
         return Environment.PRODUCTION
     }
 
-    fun initialize(playerItem: PlayItem, activity: Activity) {
+    fun initialize(
+        playerItem: PlayItem,
+        activity: Activity,
+        nativeModule: AgnoPlayBridgeModule
+    ) {
+        this.nativeModule = nativeModule
+        this.currentActivity = activity
         mediaPlayer = AgnoMediaPlayerFactory.getMediaPlayer(
             context = activity,
             lifecycleOwner = dummyLifecycleOwner,
@@ -71,54 +82,73 @@ class AgnoPlayerView @JvmOverloads constructor(
         )
         mediaPlayer?.addErrorListener(this)
         mediaPlayer?.addPlayerStateListener(this)
-        mediaPlayer?.setAudioPlayerStartsFullscreen(true)
         mediaPlayer?.setFullScreenRequestedCallback { inFullScreen ->
             activity?.requestedOrientation = if (inFullScreen) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
+            sendEvent("onFullScreen", "value", if (inFullScreen) "1" else "0")
         }
         val advertTag =
-            if (playerItem.url != null) {
-                Constants.AdTag.PRE_ROLL
+            if (playerItem.adTag != null) {
+                playerItem.adTag
             } else {
-                Constants.AdTag.PRE_MID_POST_ROLL
+                if (playerItem.showTestAd == true) {
+                    Constants.AdTag.PRE_MID_POST_ROLL
+                } else {
+                    null
+                }
             }
 
         coroutineScope.launch {
             try {
                 val playerItemFromList =
-                    if (playerItem.videoId != null && playerItem.videoId.isNotEmpty()) {
+                    if (playerItem.videoId != null && playerItem.videoId?.isNotEmpty() == true) {
                         mediaPlayer?.getPlayerItem(
-                            brandId = playerItem.brand,
+                            brandId = playerItem.brand.orEmpty(),
                             licenseKey = null,
                             videoId = playerItem.videoId.orEmpty(),
                             preferredProtocol = null,
-                            playAd = playerItem.showAds,
+                            playAd = playerItem.showAds == true,
                             advertTag = advertTag,
                             baseUrl = getEnvironment().baseUrl,
                             licenseBaseUrl = getEnvironment().licenseBaseUrl
                         )
                     } else {
                         mediaPlayer?.getPlayerItemFromUrl(
-                            brandId = playerItem.brand,
+                            brandId = playerItem.brand.orEmpty(),
                             licenseKey = null,
                             videoUrl = playerItem.url.orEmpty(),
                             preferredProtocol = null,
-                            playAd = playerItem.showAds,
+                            playAd = playerItem.showAds == true,
                             advertTag = advertTag,
                             baseUrl = getEnvironment().baseUrl,
                             licenseBaseUrl = getEnvironment().licenseBaseUrl
                         )
                     }.also { item ->
-                        item?.showShareButton = false
-                    }
+                        item?.showShareButton = playerItem.showShareButton == true
+                    }?.copy(autoplay = playerItem.autoPlay,
+                        itemTitle = playerItem.title, muteOnAutoplay = playerItem.muteOnAutoPlay,
+                        playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
+                        playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
+                        skipAds = playerItem.skipAds == true, muxId = playerItem.muxId, showTitle = playerItem.showTitle,
+                        showPlayButtonOnPause = playerItem.showPlayButtonOnPause == true, chromecastEnabled = playerItem.chromecastEnabled,
+                        loop = playerItem.loop == true, googleAnalyticsEnabled = playerItem.googleAnalyticsEnabled, googleAnalyticsId = playerItem.googleAnalyticsId)
+
                 playContent(playerItemFromList)
             } catch (ex: Exception) {
                 showError(ex)
             }
         }
+    }
+
+    private fun sendEvent(event: String, type: String, message: String) {
+            val payload = Arguments.createMap().apply {
+                putString(type, message)
+            }
+            payload.putString(type, message)
+            nativeModule?.sendEvent(event, payload)
     }
 
     private fun playContent(playerItem: PlayerItem?) {
@@ -171,5 +201,33 @@ class AgnoPlayerView @JvmOverloads constructor(
 
     override fun onPlayerStateChange(state: Int) {
         Log.i("AgnoPlayerInfo", "AgnoPlayerr::$state")
+    }
+
+    fun onHostResume() {
+        mediaPlayer?.bindToService(true)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            enterFullScreen()
+        } else {
+            exitFullScreen()
+        }
+    }
+
+    private fun enterFullScreen() {}
+
+    private fun exitFullScreen() {
+        mediaPlayer?.onFullScreenChanged(false)
+    }
+
+    fun onHostPause() {
+        mediaPlayer?.pause()
+    }
+
+    fun onHostDestroy() {
+        mediaPlayer?.release()
+        orientationEventListener?.disable()
     }
 }

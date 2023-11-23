@@ -2,3 +2,4 @@
 android/.gradle
 android/.idea
 android/build/
+node_modules/

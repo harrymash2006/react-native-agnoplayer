@@ -1,4 +1,4 @@
-package com.lib.agnoreactnative;
+package com.lib.agnoreactnative.util;
 
 public enum Environment {
     PRODUCTION(

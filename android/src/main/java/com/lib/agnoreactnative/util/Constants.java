@@ -1,4 +1,4 @@
-package com.lib.agnoreactnative;
+package com.lib.agnoreactnative.util;
 public class Constants {
     public static final String DEFAULT_BRAND_ID = "agnoplay";
     public static final String DEFAULT_VIDEO_ID = "Mbdskc9KsAii";

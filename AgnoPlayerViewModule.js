@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Platform } from 'react-native';
 import {ViewPropTypes} from 'deprecated-react-native-prop-types';
+import AgnoPlay from './AgnoPlayerNativeModule'
 
 export default class AgnoPlayerViewModule extends Component {
 
@@ -12,7 +13,8 @@ export default class AgnoPlayerViewModule extends Component {
         videoId: PropTypes.string,
         url: PropTypes.string,
         showAds: PropTypes.bool,
-        playerConfig: PropTypes.object
+        playerConfig: PropTypes.object,
+        onFullScreen: PropTypes.func,
     }
 
     static defaultProps = {
@@ -21,8 +23,21 @@ export default class AgnoPlayerViewModule extends Component {
         brand: 'agnoplay',
         videoId: 'Mbdskc9KsAii',
         //url: 'https://storage.googleapis.com/exoplayer-test-media-1/60fps/bbb-clear-1080/manifest.mpd',
-        showAds: false,
         style: {},
+    }
+
+    componentWillUnmount() {
+        AgnoPlay.emitter.removeAllListeners()
+    }
+
+    componentDidMount() {
+        AgnoPlay.emitter.addListener('onFullScreen', (type) => {
+            console.log('inside event')
+            if (this.props.onFullScreen) {
+                console.log('inside event if')
+                this.props.onFullScreen(type == "1")
+            }
+        })
     }
 
     render() {
