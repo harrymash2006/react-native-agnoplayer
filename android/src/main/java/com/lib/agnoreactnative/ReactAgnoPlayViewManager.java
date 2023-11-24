@@ -3,6 +3,7 @@ package com.lib.agnoreactnative;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -42,6 +43,11 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final String PROP_ISFULLSCREEN = "isFullScreen";
     private static final String PROP_PLAYERCONFIG = "playerConfig";
 
+    private static final String COMMAND_PLAY_NAME = "play";
+    private static final int COMMAND_PLAY_ID = 1;
+    private static final String COMMAND_PAUSE_NAME = "pause";
+    private static final int COMMAND_PAUSE_ID = 2;
+
     public ReactAgnoPlayViewManager(AgnoPlayBridgeModule nativeModule) {
         this.nativeModule = nativeModule;
     }
@@ -64,10 +70,6 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     public void setSessionKey(ReactAgnoPlayView view, @Nullable String sessionKey) {
         view.setSessionKey(sessionKey);
     }
-    @ReactProp(name = PROP_SHOWADS)
-    public void setShowAds(ReactAgnoPlayView view, @Nullable Boolean showAds) {
-        view.setShowAds(showAds);
-    }
     @ReactProp(name = PROP_BRAND)
     public void setBrand(ReactAgnoPlayView view, @Nullable String brand) {
         view.setBrand(brand);
@@ -85,6 +87,7 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     public void setPlayerConfig(final ReactAgnoPlayView view, @Nullable ReadableMap playerConfig) {
         PlayItem playItem = new PlayItem();
         playItem.setTitle(ReactBridgeUtils.safeGetString(playerConfig, PROP_TITLE, null));
+        playItem.setShowAds(ReactBridgeUtils.safeGetBool(playerConfig, PROP_SHOWADS, false));
         playItem.setAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_AUTOPLAY, false));
         playItem.setMuteOnAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_MUTEONAUTOPLAY, true));
         playItem.setPlaySkinColor(ReactBridgeUtils.safeGetString(playerConfig, PROP_PLAYERSKINCOLOR, null));
@@ -108,5 +111,42 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     @Override
     protected ReactAgnoPlayView createViewInstance(@NonNull ThemedReactContext themedReactContext) {
         return new ReactAgnoPlayView(themedReactContext, nativeModule);
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Integer> getCommandsMap() {
+        return MapBuilder.of(COMMAND_PLAY_NAME, COMMAND_PLAY_ID, COMMAND_PAUSE_NAME, COMMAND_PAUSE_ID);
+    }
+
+    @Override
+    public void receiveCommand(ReactAgnoPlayView root, int commandId, @Nullable ReadableArray args) {
+        switch (commandId) {
+            case COMMAND_PLAY_ID:
+                root.play();
+                break;
+            case COMMAND_PAUSE_ID:
+                root.onHostPause();
+                break;
+        }
+    }
+
+    @Nullable
+    @Override
+    public Map getExportedCustomBubblingEventTypeConstants() {
+        return MapBuilder.builder()
+                .put(
+                "onFullScreen",
+                MapBuilder.of(
+                        "phasedRegistrationNames",
+                        MapBuilder.of("bubbled", "onFullScreen")
+                )
+        ).build();
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
+        return super.getExportedCustomDirectEventTypeConstants();
     }
 }

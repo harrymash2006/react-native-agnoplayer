@@ -9,7 +9,12 @@ interface AgnoPlayerViewProps {
   url?: string;
   style?: ViewStyle;
   playerConfig?: ConfigProperties;
-  onFullScreen?: OnFullScreenData;
+  onFullScreen?: (e: OnFullScreenData) => void;
+}
+
+export interface AgnoPlayerViewRef {
+  play: () => void;
+  pause: () => void;
 }
 
 export default class AgnoPlayerViewModule extends Component<AgnoPlayerViewProps> {}

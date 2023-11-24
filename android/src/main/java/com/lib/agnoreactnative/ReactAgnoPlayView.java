@@ -28,6 +28,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         super(context);
         this.nativeModule = nativeModule;
         this.currentActivity = context.getCurrentActivity();
+        context.addLifecycleEventListener(this);
         createViews();
     }
 
@@ -56,21 +57,20 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         checkAndInitializePlayer();
     }
 
-    public void setShowAds(Boolean showAds) {
-        this.showAds = showAds;
-        checkAndInitializePlayer();
-    }
-
     @Override
     public void onHostResume() {
         isInBackground = false;
-        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostResume());
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onResume());
     }
 
     @Override
     public void onHostPause() {
         isInBackground = true;
-        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostPause());
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onPause());
+    }
+
+    public void play() {
+        currentActivity.runOnUiThread(() -> agnoPlayerView.play());
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     }
 
     private void releasePlayer() {
-        currentActivity.runOnUiThread(() -> agnoPlayerView.onHostDestroy());
+        currentActivity.runOnUiThread(() -> agnoPlayerView.onDestroy());
     }
     private void createViews() {
         LayoutParams layoutParams = new LayoutParams(
@@ -114,10 +114,9 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
 
     private void checkAndInitializePlayer() {
         if (agnoPlayerView != null) {
-            if (sessionKey!=null && brand!=null && (videoId!=null || url!=null) && showAds!=null && playerItem!=null){
+            if (sessionKey!=null && brand!=null && (videoId!=null || url!=null) && playerItem!=null){
                 playerItem.setSessionKey(sessionKey);
                 playerItem.setBrand(brand);
-                playerItem.setShowAds(showAds);
                 playerItem.setVideoId(videoId);
                 playerItem.setUrl(url);
                 agnoPlayerView.initialize(playerItem, currentActivity, nativeModule);

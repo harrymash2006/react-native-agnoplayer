@@ -17,6 +17,9 @@ import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayerFactory
 import com.egeniq.agno.agnoplayer.player.AgnoPlayerStateListener
 import com.egeniq.agno.agnoplayer.player.LogLevel
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.WritableMap
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.lib.agnoreactnative.util.Constants
 import com.lib.agnoreactnative.util.Environment
 import kotlinx.coroutines.launch
@@ -83,7 +86,7 @@ class AgnoPlayerView @JvmOverloads constructor(
         mediaPlayer?.addErrorListener(this)
         mediaPlayer?.addPlayerStateListener(this)
         mediaPlayer?.setFullScreenRequestedCallback { inFullScreen ->
-            activity?.requestedOrientation = if (inFullScreen) {
+            activity.requestedOrientation = if (inFullScreen) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -148,7 +151,15 @@ class AgnoPlayerView @JvmOverloads constructor(
                 putString(type, message)
             }
             payload.putString(type, message)
-            nativeModule?.sendEvent(event, payload)
+            sendNativeToJSEvent(event, payload)
+    }
+
+    private fun sendNativeToJSEvent(event: String, data: WritableMap?) {
+        currentActivity?.runOnUiThread {
+            val reactContext = context as ReactContext
+            reactContext.getJSModule(
+                DeviceEventManagerModule.RCTDeviceEventEmitter::class.java).emit(event, data)
+        }
     }
 
     private fun playContent(playerItem: PlayerItem?) {
@@ -203,7 +214,7 @@ class AgnoPlayerView @JvmOverloads constructor(
         Log.i("AgnoPlayerInfo", "AgnoPlayerr::$state")
     }
 
-    fun onHostResume() {
+    fun onResume() {
         mediaPlayer?.bindToService(true)
     }
 
@@ -216,17 +227,26 @@ class AgnoPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun enterFullScreen() {}
+    private fun enterFullScreen() {
+        sendEvent("onFullScreen", "value", "1")
+        mediaPlayer?.onFullScreenChanged(true)
+    }
 
     private fun exitFullScreen() {
+        sendEvent("onFullScreen", "value", "0")
         mediaPlayer?.onFullScreenChanged(false)
     }
 
-    fun onHostPause() {
+    fun onPause() {
+        Log.e("onPause", "onPause")
         mediaPlayer?.pause()
     }
 
-    fun onHostDestroy() {
+    fun play() {
+        mediaPlayer?.play()
+    }
+
+    fun onDestroy() {
         mediaPlayer?.release()
         orientationEventListener?.disable()
     }
