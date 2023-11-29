@@ -1,5 +1,6 @@
 package com.lib.agnoreactnative
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
@@ -9,6 +10,8 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.OrientationEventListener
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import com.egeniq.agno.agnoplayer.content.LicenseError
 import com.egeniq.agno.agnoplayer.data.model.PlayerItem
 import com.egeniq.agno.agnoplayer.player.AgnoErrorListener
@@ -35,17 +38,21 @@ class AgnoPlayerView @JvmOverloads constructor(
     private val coroutineScope = CustomViewCoroutineScope()
     private var context: Context = context
     private var agnoPlayerView: com.egeniq.agno.agnoplayer.player.ui.AgnoPlayerView
+    private var constraintLayout: ConstraintLayout
     private var mediaPlayer: AgnoMediaPlayer? = null
     private val dummyLifecycleOwner = DummyLifecycleOwner()
     private val dummyViewModelStoreOwner = DummyViewModelStoreOwner()
     private var orientationEventListener: OrientationEventListener? = null
     private var currentActivity: Activity? = null
+    private var videoIdentifier: String? = null
 
     init {
         inflate(context, R.layout.activity_stream, this)
         agnoPlayerView = findViewById(R.id.agno_player_view)
+        constraintLayout = findViewById(R.id.root_layout)
+
         agnoPlayerView.elevation = 8.0f // Set elevation
-        orientationEventListener = object : OrientationEventListener(context) {
+        /*orientationEventListener = object : OrientationEventListener(context) {
 
             override fun onOrientationChanged(orientation: Int) {
                 val isPortrait = orientation > 300 || orientation < 60 || orientation in 120..240
@@ -58,7 +65,7 @@ class AgnoPlayerView @JvmOverloads constructor(
             }
         }.also {
             it.enable()
-        }
+        }*/
 
         setupLayoutHack()
     }
@@ -73,7 +80,9 @@ class AgnoPlayerView @JvmOverloads constructor(
         nativeModule: AgnoPlayBridgeModule
     ) {
         this.nativeModule = nativeModule
+        this.videoIdentifier = playerItem.sessionKey
         this.currentActivity = activity
+        Log.e("mediaplayer", "mediaplayerinitialized")
         mediaPlayer = AgnoMediaPlayerFactory.getMediaPlayer(
             context = activity,
             lifecycleOwner = dummyLifecycleOwner,
@@ -83,22 +92,25 @@ class AgnoPlayerView @JvmOverloads constructor(
             miniPlayerView = null,
             logLevel = if (BuildConfig.DEBUG) LogLevel.DEBUG else null
         )
+
         mediaPlayer?.addErrorListener(this)
         mediaPlayer?.addPlayerStateListener(this)
         mediaPlayer?.setFullScreenRequestedCallback { inFullScreen ->
-            activity.requestedOrientation = if (inFullScreen) {
+            /*activity.requestedOrientation = if (inFullScreen) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-            sendEvent("onFullScreen", "value", if (inFullScreen) "1" else "0")
+            }*/
+            Log.e("TAG", "setFullScreenRequestedCallback")
+            exitFullScreen()
+            sendEvent("onFullScreen", "isFullScreenRequested", getFullScreenEventData(inFullScreen))
         }
         val advertTag =
             if (playerItem.adTag != null) {
                 playerItem.adTag
             } else {
                 if (playerItem.showTestAd == true) {
-                    Constants.AdTag.PRE_MID_POST_ROLL
+                    Constants.AdTag.PRE_ROLL
                 } else {
                     null
                 }
@@ -132,12 +144,18 @@ class AgnoPlayerView @JvmOverloads constructor(
                     }.also { item ->
                         item?.showShareButton = playerItem.showShareButton == true
                     }?.copy(autoplay = playerItem.autoPlay,
+                        startOffset = playerItem.startOffset,
                         itemTitle = playerItem.title, muteOnAutoplay = playerItem.muteOnAutoPlay,
                         playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
                         playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
                         skipAds = playerItem.skipAds == true, muxId = playerItem.muxId, showTitle = playerItem.showTitle,
                         showPlayButtonOnPause = playerItem.showPlayButtonOnPause == true, chromecastEnabled = playerItem.chromecastEnabled,
                         loop = playerItem.loop == true, googleAnalyticsEnabled = playerItem.googleAnalyticsEnabled, googleAnalyticsId = playerItem.googleAnalyticsId)
+
+                if (playerItem.fullScreen == true) {
+                    lockToLandscape()
+                    enterFullScreen()
+                }
 
                 playContent(playerItemFromList)
             } catch (ex: Exception) {
@@ -146,12 +164,11 @@ class AgnoPlayerView @JvmOverloads constructor(
         }
     }
 
-    private fun sendEvent(event: String, type: String, message: String) {
-            val payload = Arguments.createMap().apply {
-                putString(type, message)
+    private fun sendEvent(event: String, type: String, payload: WritableMap) {
+            val eventPayload = Arguments.createMap().apply {
+                putMap("data", payload)
             }
-            payload.putString(type, message)
-            sendNativeToJSEvent(event, payload)
+            sendNativeToJSEvent(event, eventPayload)
     }
 
     private fun sendNativeToJSEvent(event: String, data: WritableMap?) {
@@ -167,6 +184,9 @@ class AgnoPlayerView @JvmOverloads constructor(
             mediaPlayer?.showError()
         } else {
             mediaPlayer?.load(playerItem)
+            if (playerItem.autoplay == true) {
+                //mediaPlayer?.play()
+            }
         }
     }
 
@@ -193,6 +213,7 @@ class AgnoPlayerView @JvmOverloads constructor(
 
     private fun showError(error: Exception?) {
         if (error != null) {
+            Log.e("showError:", error.localizedMessage)
             if (error is LicenseError) {
                 mediaPlayer?.showError(error.errorDescription(context))
             } else {
@@ -221,19 +242,27 @@ class AgnoPlayerView @JvmOverloads constructor(
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         if (newConfig?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            enterFullScreen()
+            //enterFullScreen()
         } else {
-            exitFullScreen()
+            //exitFullScreen()
         }
     }
 
+    private fun getFullScreenEventData(isFullScreen: Boolean): WritableMap {
+        val payload = Arguments.createMap()
+        payload.putBoolean("isFullScreenRequested", isFullScreen)
+        payload.putString("sessionKey", videoIdentifier)
+        payload.putBoolean("isPlaying", mediaPlayer?.getPlaybackState() == 3)
+        payload.putString("imageUrl", mediaPlayer?.playerItem?.posterURL)
+        mediaPlayer?.getCurrentPosition()?.let { payload.putInt("duration", it.toInt()) }
+        return payload
+    }
+
     private fun enterFullScreen() {
-        sendEvent("onFullScreen", "value", "1")
         mediaPlayer?.onFullScreenChanged(true)
     }
 
     private fun exitFullScreen() {
-        sendEvent("onFullScreen", "value", "0")
         mediaPlayer?.onFullScreenChanged(false)
     }
 
@@ -249,5 +278,36 @@ class AgnoPlayerView @JvmOverloads constructor(
     fun onDestroy() {
         mediaPlayer?.release()
         orientationEventListener?.disable()
+    }
+
+    fun seekTo(position: Int) {
+        mediaPlayer?.seekTo(position.toLong())
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    fun lockToPortrait() {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        constraintSet.setDimensionRatio(R.id.agno_player_view, "H,9:16")
+        constraintSet.applyTo(constraintLayout)
+        rootView?.postDelayed({
+            currentActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }, 100)
+    }
+
+    fun lockToLandscape() {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        constraintSet.setDimensionRatio(R.id.agno_player_view, "H,16:9")
+        constraintSet.applyTo(constraintLayout)
+        rootView?.postDelayed({
+            currentActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }, 100)
+    }
+
+    fun closeFullScreenPlayer() {
+        exitFullScreen()
+        lockToPortrait()
+        sendEvent("onFullScreen", "isFullScreenRequested", getFullScreenEventData(false))
     }
 }

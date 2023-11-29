@@ -2,6 +2,7 @@ package com.lib.agnoreactnative;
 
 import androidx.annotation.NonNull;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
@@ -16,6 +17,11 @@ public class AgnoPlayPackage  implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactApplicationContext) {
         nativeModule = new AgnoPlayBridgeModule(reactApplicationContext);
         return Collections.singletonList(nativeModule);
+    }
+
+    // Deprecated RN 0.47
+    public List<Class<? extends JavaScriptModule>> createJSModules() {
+        return Collections.emptyList();
     }
 
     @NonNull

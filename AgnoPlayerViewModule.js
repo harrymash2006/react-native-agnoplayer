@@ -3,14 +3,18 @@ import PropTypes from 'prop-types';
 import { Platform, UIManager, findNodeHandle, requireNativeComponent } from 'react-native';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 import AgnoPlay from './AgnoPlayerNativeModule';
+const AgnoPlayerView = requireNativeComponent('RCTAgnoPlay');
 
 const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, showAds, playerConfig, onFullScreen, style }, ref) => {
   const viewRef = useRef(null);
 
   useEffect(() => {
-    const onFullScreenListener = (type) => {
+    const onFullScreenListener = (fullScreenData) => {
       if (onFullScreen) {
-        onFullScreen(type?.value === '1');
+        const data = fullScreenData.data
+        if (data && data.sessionKey == sessionKey) {
+          onFullScreen(data)
+        }
       }
     };
 
@@ -26,34 +30,65 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
       if (viewRef.current) {
         UIManager.dispatchViewManagerCommand(
           findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.play,
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.play.toString(),
           null
         );
       }
     },
     pause: () => {
-      console.log('inside pause')
       if (viewRef.current) {
-        console.log('inside pause if')
         UIManager.dispatchViewManagerCommand(
           findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.pause,
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.pause.toString(),
           null
         );
       }
     },
+    lockToPortrait: () => {
+      if (viewRef.current) {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(viewRef.current),
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToPortrait.toString(),
+          null
+        );
+      }
+    },
+    lockToLandscape: () => {
+      if (viewRef.current) {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(viewRef.current),
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToLandscape.toString(),
+          null
+        );
+      }
+    },
+    closeFullScreenPlayer: () => {
+      if (viewRef.current) {
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(viewRef.current),
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.closeFullScreenPlayer.toString(),
+          null
+        );
+      }
+    },
+    seekTo: (position) => {
+      if (viewRef.current) {
+        console.log('inside seekTo:', position)
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(viewRef.current),
+          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.seekTo.toString(),
+          [position]
+        );
+      }
+    }
   }));
 
-  if (Platform.OS === 'android') {
-    return (
-      <AgnoPlayerView
-        ref={viewRef}
-        {...{ sessionKey, brand, videoId, url, showAds, playerConfig, style }}
-      />
-    );
-  } else {
-    return null;
-  }
+  return (
+    <AgnoPlayerView
+      ref={viewRef}
+      {...{ sessionKey, brand, videoId, url, showAds, playerConfig, style }}
+    />
+  );
 });
 
 AgnoPlayerViewModule.propTypes = {
@@ -64,10 +99,12 @@ AgnoPlayerViewModule.propTypes = {
   url: PropTypes.string,
   playerConfig: PropTypes.shape({
     itemTitle: PropTypes.string,
-    autoplay: PropTypes.bool,
+    autoPlay: PropTypes.bool,
     showAds: PropTypes.bool,
     showTestAd: PropTypes.bool,
     muteOnAutoplay: PropTypes.bool,
+    isFullScreen: PropTypes.bool,
+    startOffset: PropTypes.number,
     playerSkinColor: PropTypes.string,
     posterURL: PropTypes.string,
     adTag: PropTypes.string,
@@ -94,11 +131,13 @@ AgnoPlayerViewModule.defaultProps = {
   style: {},
   playerConfig: {
     itemTitle: null,
-    autoplay: false,
+    autoPlay: false,
     muteOnAutoplay: true,
     playerSkinColor: '#FFFFFF',
     posterURL: null,
-    adTag: 'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonly&cmsid=496&vid=short_onecue&correlator=',
+    adTag: null,
+    isFullScreen: false,
+    startOffset: 0,
     showTestAd: false,
     showAds: false,
     playButtonBackgroundColor: '#0000FF',
@@ -115,6 +154,4 @@ AgnoPlayerViewModule.defaultProps = {
   },
 };
 
-const AgnoPlayerView = Platform.OS === 'android' ? requireNativeComponent('RCTAgnoPlay', AgnoPlayerViewModule, { nativeOnly: {} }) : null;
-
-export default AgnoPlayerViewModule;
+export default AgnoPlayerViewModule

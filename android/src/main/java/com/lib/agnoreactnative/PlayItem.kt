@@ -12,6 +12,7 @@ class PlayItem {
     var skipAds: Boolean? = null
     var muteOnAutoPlay: Boolean? = null
     var fullScreen: Boolean? = null
+    var startOffset: Long? = 0
     var playSkinColor: String? = null
     var playButtonBackgroundColor: String? = null
     var autoPlay: Boolean? = null

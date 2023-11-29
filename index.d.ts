@@ -12,9 +12,18 @@ interface AgnoPlayerViewProps {
   onFullScreen?: (e: OnFullScreenData) => void;
 }
 
+export interface AgnoPlayNativeModule {
+  lockToPortrait: () => Promise<void>;
+  lockToLandscape: () => Promise<void>;
+}
+
 export interface AgnoPlayerViewRef {
   play: () => void;
   pause: () => void;
+  seekTo: (position: number) => void,
+  closeFullScreenPlayer: () => void,
+  lockToPortrait: () => void,
+  lockToLandscape: () => void
 }
 
 export default class AgnoPlayerViewModule extends Component<AgnoPlayerViewProps> {}

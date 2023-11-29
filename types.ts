@@ -1,6 +1,8 @@
 export type ConfigProperties = {
     itemTitle?: string;
-    autoplay?: boolean;
+    autoPlay?: boolean;
+    isFullScreen?: boolean;
+    startOffset?: number;
     muteOnAutoplay?: boolean;
     playerSkinColor?: string;
     posterURL?: string;
@@ -22,6 +24,10 @@ export type ConfigProperties = {
 
   export type OnFullScreenData = Readonly<{
     isFullScreenRequested: boolean;
+    sessionKey: string;
+    duration: number;
+    isPlaying: boolean;
+    imageUrl: string;
   }>;
 
   export type ConfigProps = Readonly<

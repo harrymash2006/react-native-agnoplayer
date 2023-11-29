@@ -15,8 +15,6 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     private String brand;
     private String videoId;
     private String url;
-
-    private Boolean showAds;
     private AgnoPlayBridgeModule nativeModule;
     private AgnoPlayerView agnoPlayerView;
     private boolean isInBackground;
@@ -122,5 +120,22 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
                 agnoPlayerView.initialize(playerItem, currentActivity, nativeModule);
             }
         }
+    }
+
+    public void seekTo(int position) {
+        Log.i("TAG", "seekto:"+position);
+        agnoPlayerView.seekTo(position);
+    }
+
+    public void lockToPortrait() {
+        agnoPlayerView.lockToPortrait();
+    }
+
+    public void closeFullScreenPlayer() {
+        agnoPlayerView.closeFullScreenPlayer();
+    }
+
+    public void lockToLandscape() {
+        agnoPlayerView.lockToLandscape();
     }
 }

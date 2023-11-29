@@ -41,12 +41,22 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
 
     private static final String PROP_SHOWADS = "showAds";
     private static final String PROP_ISFULLSCREEN = "isFullScreen";
+    private static final String PROP_STARTOFFSET = "startOffset";
+
     private static final String PROP_PLAYERCONFIG = "playerConfig";
 
     private static final String COMMAND_PLAY_NAME = "play";
     private static final int COMMAND_PLAY_ID = 1;
     private static final String COMMAND_PAUSE_NAME = "pause";
     private static final int COMMAND_PAUSE_ID = 2;
+    private static final String COMMAND_SEEK_NAME = "seekTo";
+    private static final int COMMAND_SEEK_ID = 3;
+    private static final String COMMAND_PORTRAIT_NAME = "lockToPortrait";
+    private static final int COMMAND_PORTRAIT_ID = 4;
+    private static final String COMMAND_CLOSEFULLSCREEN_NAME = "closeFullScreenPlayer";
+    private static final int COMMAND_CLOSEFULLSCREEN_ID = 5;
+    private static final String COMMAND_LANDSCAPE_NAME = "lockToLandscape";
+    private static final int COMMAND_LANDSCAPE_ID = 6;
 
     public ReactAgnoPlayViewManager(AgnoPlayBridgeModule nativeModule) {
         this.nativeModule = nativeModule;
@@ -88,6 +98,8 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
         PlayItem playItem = new PlayItem();
         playItem.setTitle(ReactBridgeUtils.safeGetString(playerConfig, PROP_TITLE, null));
         playItem.setShowAds(ReactBridgeUtils.safeGetBool(playerConfig, PROP_SHOWADS, false));
+        playItem.setStartOffset((long) ReactBridgeUtils.safeGetInt(playerConfig, PROP_STARTOFFSET, 0));
+        playItem.setFullScreen(ReactBridgeUtils.safeGetBool(playerConfig, PROP_ISFULLSCREEN, false));
         playItem.setAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_AUTOPLAY, false));
         playItem.setMuteOnAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_MUTEONAUTOPLAY, true));
         playItem.setPlaySkinColor(ReactBridgeUtils.safeGetString(playerConfig, PROP_PLAYERSKINCOLOR, null));
@@ -116,17 +128,36 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        return MapBuilder.of(COMMAND_PLAY_NAME, COMMAND_PLAY_ID, COMMAND_PAUSE_NAME, COMMAND_PAUSE_ID);
+        return MapBuilder.of(COMMAND_PLAY_NAME, COMMAND_PLAY_ID,
+                COMMAND_PAUSE_NAME, COMMAND_PAUSE_ID,
+                COMMAND_SEEK_NAME, COMMAND_SEEK_ID,
+                COMMAND_PORTRAIT_NAME, COMMAND_PORTRAIT_ID,
+                COMMAND_LANDSCAPE_NAME, COMMAND_LANDSCAPE_ID,
+                COMMAND_CLOSEFULLSCREEN_NAME, COMMAND_CLOSEFULLSCREEN_ID);
     }
 
     @Override
-    public void receiveCommand(ReactAgnoPlayView root, int commandId, @Nullable ReadableArray args) {
-        switch (commandId) {
+    public void receiveCommand(ReactAgnoPlayView root, String commandId, @Nullable ReadableArray args) {
+        super.receiveCommand(root, commandId, args);
+        switch (Integer.parseInt(commandId)) {
             case COMMAND_PLAY_ID:
                 root.play();
                 break;
             case COMMAND_PAUSE_ID:
                 root.onHostPause();
+                break;
+            case COMMAND_SEEK_ID:
+                assert args != null;
+                root.seekTo(args.getInt(0));
+                break;
+            case COMMAND_PORTRAIT_ID:
+                root.lockToPortrait();
+                break;
+            case COMMAND_LANDSCAPE_ID:
+                root.lockToLandscape();
+                break;
+            case COMMAND_CLOSEFULLSCREEN_ID:
+                root.closeFullScreenPlayer();
                 break;
         }
     }
