@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "13.4"
   s.source_files = "ios/RCTAgnoPlay/**/*.{h,m,swift}"
   s.dependency "React-Core"
-  s.dependency "https://Private-Token:glpat-8gzTx5j18FDHFPPHFc4S@gitlab.mediahuisgroup.com/core-services/AgnoPlay-iOS.git", "~> 3.1.0"
+  s.dependency 'AgnoplayerSDK', :git => 'https://username:password@gitlab.mediahuisgroup.com/core-services/AgnoPlay-iOS.git', :tag => '3.1.0'
   s.static_framework = true
   s.xcconfig = {
     'OTHER_LDFLAGS': '-ObjC',
