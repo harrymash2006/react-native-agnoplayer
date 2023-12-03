@@ -1,10 +1,9 @@
-import {NativeModules, NativeEventEmitter} from 'react-native';
+import {NativeModules, NativeEventEmitter, Platform} from 'react-native';
 
-const {AgnoPlay} = NativeModules;
 
-const AgnoPlayEmitter = new NativeEventEmitter(AgnoPlay);
+const AgnoPlayEmitter = new NativeEventEmitter(Platform.OS === 'android' ? NativeModules.AgnoPlay : NativeModules.AgnoPlayManager);
 
 export default {
-    nativeModule: AgnoPlay,
+    nativeModule: Platform.OS === 'android' ? NativeModules.AgnoPlay: NativeModules.AgnoPlayManager,
     emitter: AgnoPlayEmitter
 };

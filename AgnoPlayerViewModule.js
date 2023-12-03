@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import { Platform, UIManager, findNodeHandle, requireNativeComponent } from 'react-native';
+import { UIManager, findNodeHandle, requireNativeComponent } from 'react-native';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 import AgnoPlay from './AgnoPlayerNativeModule';
 const AgnoPlayerView = requireNativeComponent('RCTAgnoPlay');
@@ -82,7 +82,7 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
       }
     }
   }));
-
+  
   return (
     <AgnoPlayerView
       ref={viewRef}
