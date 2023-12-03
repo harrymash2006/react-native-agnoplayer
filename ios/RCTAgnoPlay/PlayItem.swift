@@ -5,7 +5,7 @@
 //  Created by HARDIK MASHRU on 03/12/23.
 //
 
-class PlayItem {
+struct PlayItem {
     var sessionKey: String?
     var brand: String?
     var title: String?
@@ -31,35 +31,37 @@ class PlayItem {
     var loop: Bool?
     var googleAnalyticsEnabled: Bool?
     var googleAnalyticsId: String?
-    
-    init() {}
-    
-    init(from dictionary: [String: Any]) {
-        sessionKey = dictionary["sessionKey"] as? String
-        brand = dictionary["brand"] as? String
-        title = dictionary["title"] as? String
-        videoId = dictionary["videoId"] as? String
-        url = dictionary["url"] as? String
-        showTestAd = dictionary["showTestAd"] as? Bool
-        adTag = dictionary["adTag"] as? String
-        showAds = dictionary["showAds"] as? Bool
-        skipAds = dictionary["skipAds"] as? Bool
-        muteOnAutoPlay = dictionary["muteOnAutoPlay"] as? Bool
-        fullScreen = dictionary["fullScreen"] as? Bool
-        startOffset = dictionary["startOffset"] as? Int64
-        playSkinColor = dictionary["playSkinColor"] as? String
-        playButtonBackgroundColor = dictionary["playButtonBackgroundColor"] as? String
-        autoPlay = dictionary["autoPlay"] as? Bool
-        posterURL = dictionary["posterURL"] as? String
-        hideProgressBarInAds = dictionary["hideProgressBarInAds"] as? Bool
-        muxId = dictionary["muxId"] as? String
-        showTitle = dictionary["showTitle"] as? Bool
-        showPlayButtonOnPause = dictionary["showPlayButtonOnPause"] as? Bool
-        showShareButton = dictionary["showShareButton"] as? Bool
-        chromecastEnabled = dictionary["chromecastEnabled"] as? Bool
-        loop = dictionary["loop"] as? Bool
-        googleAnalyticsEnabled = dictionary["googleAnalyticsEnabled"] as? Bool
-        googleAnalyticsId = dictionary["googleAnalyticsId"] as? String
+        
+    init(_ data: NSDictionary!) {
+        guard data != nil else {
+            return
+        }
+        
+        sessionKey = data["sessionKey"] as? String
+        brand = data["brand"] as? String
+        title = data["title"] as? String
+        videoId = data["videoId"] as? String
+        url = data["url"] as? String
+        showTestAd = data["showTestAd"] as? Bool
+        adTag = data["adTag"] as? String
+        showAds = data["showAds"] as? Bool
+        skipAds = data["skipAds"] as? Bool
+        muteOnAutoPlay = data["muteOnAutoPlay"] as? Bool
+        fullScreen = data["fullScreen"] as? Bool
+        startOffset = data["startOffset"] as? Int64
+        playSkinColor = data["playSkinColor"] as? String
+        playButtonBackgroundColor = data["playButtonBackgroundColor"] as? String
+        autoPlay = data["autoPlay"] as? Bool
+        posterURL = data["posterURL"] as? String
+        hideProgressBarInAds = data["hideProgressBarInAds"] as? Bool
+        muxId = data["muxId"] as? String
+        showTitle = data["showTitle"] as? Bool
+        showPlayButtonOnPause = data["showPlayButtonOnPause"] as? Bool
+        showShareButton = data["showShareButton"] as? Bool
+        chromecastEnabled = data["chromecastEnabled"] as? Bool
+        loop = data["loop"] as? Bool
+        googleAnalyticsEnabled = data["googleAnalyticsEnabled"] as? Bool
+        googleAnalyticsId = data["googleAnalyticsId"] as? String
     }
 }
 

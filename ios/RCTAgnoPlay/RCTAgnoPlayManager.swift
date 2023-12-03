@@ -84,7 +84,7 @@ class RCTAgnoPlayManager: RCTViewManager {
           let view = viewRegistry?[reactTag]
           if !(view is RCTAgnoPlay) {
               RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
-          } else if let view = view as? RCTVideo {
+          } else if let view = view as? RCTAgnoPlay {
               view.seekTo(position)
           }
       })

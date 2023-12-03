@@ -21,36 +21,37 @@ class RCTAgnoPlay: UIView {
 
   @objc
   func setPlayerConfig(_ playerConfig:NSDictionary!) {
-    _playerItem = PlayItem.init(from: playerConfig)
+    _playerItem = PlayItem.init(playerConfig)
     checkAndInitializePlayer()
   }
   
   @objc
-  func setSessionKey(_ sessionKey:NSString) {
+  func setSessionKey(_ sessionKey:String) {
     _sessionKey = sessionKey
     checkAndInitializePlayer()
   }
   
   @objc
-  func setBrand(_ brand:NSString) {
+  func setBrand(_ brand:String) {
     _brand = brand
     checkAndInitializePlayer()
   }
   
   @objc
-  func setVideoId(_ videoId:NSString) {
+  func setVideoId(_ videoId:String) {
     _videoId = videoId
     checkAndInitializePlayer()
   }
   
   @objc
-  func setUrl(_ url:NSString) {
+  func setUrl(_ url:String) {
     _url = url
     checkAndInitializePlayer()
   }
   
   init(eventDispatcher:RCTEventDispatcher!) {
-    
+    super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+      
     NotificationCenter.default.addObserver(
         self,
         selector: #selector(applicationWillResignActive(notification:)),
@@ -80,12 +81,15 @@ class RCTAgnoPlay: UIView {
     )
     
   }
-  
+    
+  required init?(coder aDecoder: NSCoder) {
+      super.init(coder: aDecoder)
+  }
+    
   func checkAndInitializePlayer() {
-    if let sessionKey = sessionKey,
-       let brand = brand,
-       (videoId != nil || url != nil),
-       let playerItem = playerItem {
+      if _sessionKey != nil, _brand != nil,
+       (_videoId != nil || _url != nil),
+       _playerItem != nil {
       initializePlayer()
     }
   }
