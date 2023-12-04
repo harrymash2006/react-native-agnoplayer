@@ -11,13 +11,13 @@ import React
 class RCTAgnoPlayManager: RCTViewManager {
   
   override func view() -> UIView {
-      return RCTAgnoPlay(eventDispatcher: bridge.eventDispatcher() as! RCTEventDispatcher)
+      return RCTAgnoPlay(eventDispatcher: bridge.eventDispatcher() as? RCTEventDispatcher)
   }
   
   func methodQueue() -> DispatchQueue {
       return bridge.uiManager.methodQueue
   }
-  
+      
   @objc(play:)
   func play(_ reactTag: NSNumber) -> Void {
       bridge.uiManager.prependUIBlock({_ , viewRegistry in
@@ -93,5 +93,7 @@ class RCTAgnoPlayManager: RCTViewManager {
   override class func requiresMainQueueSetup() -> Bool {
       return true
   }
+    
+  
   
 }

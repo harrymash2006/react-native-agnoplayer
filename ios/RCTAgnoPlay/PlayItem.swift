@@ -47,7 +47,7 @@ struct PlayItem {
         showAds = data["showAds"] as? Bool
         skipAds = data["skipAds"] as? Bool
         muteOnAutoPlay = data["muteOnAutoPlay"] as? Bool
-        fullScreen = data["fullScreen"] as? Bool
+        fullScreen = data["isFullScreen"] as? Bool
         startOffset = data["startOffset"] as? Int64
         playSkinColor = data["playSkinColor"] as? String
         playButtonBackgroundColor = data["playButtonBackgroundColor"] as? String

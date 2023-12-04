@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import { UIManager, findNodeHandle, requireNativeComponent } from 'react-native';
+import { Platform, UIManager, findNodeHandle, requireNativeComponent } from 'react-native';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 import AgnoPlay from './AgnoPlayerNativeModule';
 const AgnoPlayerView = requireNativeComponent('RCTAgnoPlay');
@@ -9,10 +9,11 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
   const viewRef = useRef(null);
 
   useEffect(() => {
+    
     const onFullScreenListener = (fullScreenData) => {
       if (onFullScreen) {
         const data = fullScreenData.data
-        if (data && data.sessionKey == sessionKey) {
+        if (data && data.sessionKey === sessionKey) {
           onFullScreen(data)
         }
       }
@@ -24,6 +25,12 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
         AgnoPlay.emitter.removeAllListeners('onFullScreen')
     };
   });
+
+  const onFullScreenEventIOS = (data) => {
+      if (onFullScreen && data && data.sessionKey === sessionKey) {
+        onFullScreen(data)
+      }
+  }
 
   useImperativeHandle(ref, () => ({
     play: () => {
@@ -37,11 +44,16 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
     },
     pause: () => {
       if (viewRef.current) {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.pause.toString(),
-          null
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.pause.toString(),
+            null
+          );
+        } else {
+          AgnoPlay.nativeModule.pause(findNodeHandle(viewRef.current))
+        }
+        
       }
     },
     lockToPortrait: () => {
@@ -86,6 +98,7 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
   return (
     <AgnoPlayerView
       ref={viewRef}
+      onFullScreen={(data) => onFullScreenEventIOS(data?.nativeEvent)}
       {...{ sessionKey, brand, videoId, url, showAds, playerConfig, style }}
     />
   );

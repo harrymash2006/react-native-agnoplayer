@@ -9,7 +9,7 @@ import Foundation
 import React
 import AVFoundation
 import AgnoplayerSDK
-
+    
 class RCTAgnoPlay: UIView {
   
   private var _sessionKey: String = ""
@@ -18,7 +18,8 @@ class RCTAgnoPlay: UIView {
   private var _url:String? = nil
   private var _playerItem: PlayItem? = nil
   private var playerViewController: AgnoplayerViewController?
-
+  private var _eventDispatcher:RCTEventDispatcher?
+    
   // Events
   @objc var onFullScreen: RCTDirectEventBlock?
 
@@ -50,10 +51,21 @@ class RCTAgnoPlay: UIView {
   func setUrl(_ url:String) {
     _url = url
     checkAndInitializePlayer()
+      
+  }
+    
+  override func removeFromSuperview() {
+      playerViewController?.player?.pause()
+      playerViewController?.removeFromParent()
+      playerViewController = nil
+      _eventDispatcher = nil
+      NotificationCenter.default.removeObserver(self)
+      super.removeFromSuperview()
   }
   
   init(eventDispatcher:RCTEventDispatcher!) {
     super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    _eventDispatcher = eventDispatcher
       
     NotificationCenter.default.addObserver(
         self,
@@ -116,28 +128,28 @@ class RCTAgnoPlay: UIView {
       
       if let playerConfig = _playerItem {
           
-          var agnoPlayerItem = PlayerItem(title: playerConfig.title ?? "",
+          /*var agnoPlayerItem = PlayerItem(title: playerConfig.title ?? "",
                                           identifier: _url ?? "",
+                                          mediaId: playerConfig.videoId, 
                                           autoplay: playerConfig.autoPlay,
-                                          playerSkinColor: playerConfig.playSkinColor, 
-                                          skipAds: playerConfig.skipAds, 
+                                          playerSkinColor: playerConfig.playSkinColor,
+                                          playButtonBackgroundColor: playerConfig.playButtonBackgroundColor ?? "#ffffff", 
+                                          skipAds: playerConfig.skipAds,
                                           muxId: playerConfig.muxId,
-                                          showPlayButtonOnPause: playerConfig.showPlayButtonOnPause, 
+                                          showTitle: playerConfig.showTitle, 
+                                          showPlayButtonOnPause: playerConfig.showPlayButtonOnPause,
                                           chromecastEnabled: playerConfig.chromecastEnabled,
                                           airplayEnabled: playerConfig.chromecastEnabled,
                                           audioPlayerBackgroundColor: playerConfig.playSkinColor,
+                                          googleAnalyticsEnabled: playerConfig.googleAnalyticsEnabled ?? false,
+                                          googleAnalyticsId: playerConfig.googleAnalyticsId, 
                                           muteOnAutoplay: playerConfig.muteOnAutoPlay ?? true,
                                           brandImage: _brand
                                         )
-          agnoPlayerItem.mediaId = playerConfig.videoId
           if let url = playerConfig.posterURL.flatMap({ URL(string: $0) }) {
               agnoPlayerItem.posterURL = url
           }
-          agnoPlayerItem.playButtonBackgroundColor = playerConfig.playButtonBackgroundColor ?? "#ffffff"
-          agnoPlayerItem.showTitle = playerConfig.showTitle
           agnoPlayerItem.loop = playerConfig.loop ?? false
-          agnoPlayerItem.googleAnalyticsEnabled = playerConfig.googleAnalyticsEnabled
-          agnoPlayerItem.googleAnalyticsId = playerConfig.googleAnalyticsId
           
           if playerConfig.showAds ?? false {
               agnoPlayerItem.vastURL = playerConfig.adTag
@@ -154,93 +166,135 @@ class RCTAgnoPlay: UIView {
           }
           guard let playerViewController = playerViewController else { return }
           playerViewController.view.frame = self.bounds
-          addSubview(playerViewController.view)
-      }
-      
-      
-      
-      /*Agnoplayer.getPlayerItem(brand: _brand,
-                               id: _videoId,
-                               preferredProtocol: nil,
-                               cimData: nil,
-                               licenseKey: LicenseConfig.agnoplay.rawValue) { [weak self] playerItem in
-          guard let self = self else { return }
+          addSubview(playerViewController.view)*/
           
-          var modifiedItem = playerItem
-          if let playerConfig = _playerItem {
+          Agnoplayer.getPlayerItem(brand: _brand,
+                                   id: _videoId,
+                                   preferredProtocol: nil,
+                                   cimData: nil,
+                                   licenseKey: LicenseConfig.agnoplay.rawValue) { [weak self] playerItem in
+              guard let self = self else { return }
+              
+              var modifiedItem = playerItem
               modifiedItem.showShareButton = playerConfig.showShareButton ?? false
               modifiedItem.autoplay = playerConfig.autoPlay
               modifiedItem.muteOnAutoplay = playerConfig.muteOnAutoPlay ?? true
-              modifiedItem.muxId = playerItem.muxId
+              modifiedItem.playerSkinColor = playerConfig.playSkinColor ?? "#FFFFFF"
+              modifiedItem.itemTitle = playerConfig.title
+              modifiedItem.playButtonBackgroundColor = playerConfig.playButtonBackgroundColor ?? "#0000FF"
+              modifiedItem.showTitle = playerConfig.showTitle
+              modifiedItem.googleAnalyticsId = playerConfig.googleAnalyticsId
+              modifiedItem.googleAnalyticsEnabled = playerConfig.googleAnalyticsEnabled
+              
+              if let url = playerConfig.posterURL.flatMap({ URL(string: $0) }) {
+                  modifiedItem.posterURL = url
+              }
+              
+              if let url = playerConfig.url {
+                  modifiedItem.identifier = url
+              }
+
+              
+              if playerConfig.showAds ?? false {
+                  modifiedItem.vastURL = playerConfig.adTag
+              }
+              
+              self.createOrUpdatePlayerWith(modifiedItem, playerConfig: playerConfig)
           }
           
-          if let url = exampleItem.url {
-              modifiedItem.identifier = url
+          onError: { [weak self] error in
+              guard let self = self else { return }
+              
+              print(error)
+              self.playerViewController?.player?.pause()
+              self.playerViewController?.player?.stop()
+              if error is LicenseError {
+                  DispatchQueue.main.async(execute: {
+                      print("licence error")
+                  })
+              }
           }
-          
-          if case .test = exampleItem.configuration {
-              modifiedItem.audioPlayerStartsFullscreen = true
-          }
-          
-          if exampleItem.showAds {
-              modifiedItem.vastURL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator="
-          }
-          
-          self.createOrUpdatePlayerWith(modifiedItem)
-          
-          self.isLoading = false
       }
       
-      onError: { [weak self] error in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-          print(error)
-          self.playerViewController?.player?.pause()
-          self.playerViewController?.player?.stop()
-          if error is LicenseError {
-              let alert = UIAlertController(title: "Brand Error", message: "\(exampleItem.title) \n \(exampleItem.brand) \n\n \(error.localizedDescription)", preferredStyle: .alert)
-              let ok = UIAlertAction(title: "OK", style: .default)
-              alert.addAction(ok)
-              DispatchQueue.main.async(execute: {
-                  self.present(alert, animated: true, completion: {
-                      self.tableView.deselectRow(at: IndexPath(row: exampleItemIndex, section: 0), animated: true)
-                  })
-              })
-          }
-      }*/
   }
+    
+    private func createOrUpdatePlayerWith(_ item: PlayerItem, playerConfig: PlayItem) {
+      playerViewController = AgnoplayerViewController.create(playerItem: item, delegate: nil, reporter: nil, expandedPlayerPresentationStyle: .pageSheet)
+      playerViewController?.isPipEnabled = false
+      if let timeMicroseconds = playerConfig.startOffset {
+          let cmTime = CMTime(value: CMTimeValue(timeMicroseconds), timescale: 1000000)
+          playerViewController?.player?.seek(to: cmTime)
+          if (!(playerConfig.autoPlay ?? false)) {
+              playerViewController?.player?.pause()
+          }
+          if (playerConfig.fullScreen ?? false) {
+              playerViewController?.modalPresentationStyle = .fullScreen
+              //setDeviceOrientation(orientation: .landscapeLeft)
+          }
+      }
+      guard let playerViewController = playerViewController else { return }
+      playerViewController.view.frame = self.bounds
+      addSubview(playerViewController.view)
+  }
+    
+  func setDeviceOrientation(orientation: UIInterfaceOrientation) {
+     UIDevice.current.setValue(orientation.rawValue, forKey: "orientation")
+  }
+
   
   func play() {
-    
+      playerViewController?.player?.play()
   }
   
   func pause() {
-    
+      playerViewController?.player?.pause()
   }
   
   func closeFullScreenPlayer() {
+      playerViewController?.modalPresentationStyle = .pageSheet
+      onFullScreen?(getFullScreenData(isFullScreen: false))
+  }
     
+  @objc func sendEvent(data: Dictionary<String,Any>) {
+      NotificationCenter.default.post(
+          name: Notification.Name("onFullScreen"),
+          object: nil,
+          userInfo: data
+      )
+  }
+    
+  func getFullScreenData(isFullScreen: Bool) -> Dictionary<String, Any> {
+        let cmTime = CMTime(value: CMTimeValue(0), timescale: 1000000)
+        return ["isFullScreenRequested": isFullScreen,
+            "sessionKey": _sessionKey,
+            "isPlaying": playerViewController?.player?.isPlaying,
+            "imageUrl": playerViewController?.playerItem?.posterURL?.absoluteString,
+            "target": self.reactTag,
+            "duration": NSNumber(value: Float(CMTimeGetSeconds(playerViewController?.player?.currentTime ?? cmTime)))]
   }
   
   func lockToPortrait() {
-    
+      playerViewController?.modalPresentationStyle = .pageSheet
   }
   
   func lockToLandscape() {
-    
+      playerViewController?.modalPresentationStyle = .fullScreen
   }
   
   func seekTo(_ position: NSNumber) {
-    
+      let cmTime = CMTime(value: CMTimeValue(truncating: position), timescale: 1000000)
+      playerViewController?.player?.seek(to: cmTime)
   }
     
   @objc private func enterFullScreen(_ notification:Notification) {
         // full screen layout change here
+      onFullScreen?(getFullScreenData(isFullScreen: true))
+      //sendEvent(data: getFullScreenData(isFullScreen: true))
   }
 
   @objc private func exitFullScreen(_ notification:Notification) {
         // non full screen layout change here
+      onFullScreen?(getFullScreenData(isFullScreen: false))
   }
   
   @objc func applicationWillResignActive(notification:NSNotification!) {
@@ -248,11 +302,10 @@ class RCTAgnoPlay: UIView {
   }
   
   @objc func applicationDidBecomeActive(notification: NSNotification!) {
-    
   }
   
   @objc func applicationDidEnterBackground(notification:NSNotification!) {
-    
+      playerViewController?.player?.pause()
   }
   
   @objc func applicationWillEnterForeground(notification:NSNotification!) {
