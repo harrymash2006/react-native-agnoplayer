@@ -27,7 +27,10 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
   });
 
   const onFullScreenEventIOS = (data) => {
-      if (onFullScreen && data && data.sessionKey === sessionKey) {
+      console.log('onFullScreenEventIOS:', data)
+      if (Platform.OS === 'ios' && onFullScreen && data && "key_"+data.identifier === sessionKey) {
+        onFullScreen(data)
+      } else if (Platform.OS === 'ios' && onFullScreen && !data.isFullScreenRequested && data.identifier == "0") {
         onFullScreen(data)
       }
   }
@@ -35,11 +38,16 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
   useImperativeHandle(ref, () => ({
     play: () => {
       if (viewRef.current) {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.play.toString(),
-          null
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.play.toString(),
+            null
+          );
+        } else {
+          AgnoPlay.nativeModule.play(findNodeHandle(viewRef.current))
+        }
+        
       }
     },
     pause: () => {
@@ -58,39 +66,58 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
     },
     lockToPortrait: () => {
       if (viewRef.current) {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToPortrait.toString(),
-          null
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToPortrait.toString(),
+            null
+          );
+        } else {
+          AgnoPlay.nativeModule.lockToPortrait(findNodeHandle(viewRef.current))
+        }
+        
       }
     },
     lockToLandscape: () => {
       if (viewRef.current) {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToLandscape.toString(),
-          null
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.lockToLandscape.toString(),
+            null
+          );
+        } else {
+          AgnoPlay.nativeModule.lockToLandscape(findNodeHandle(viewRef.current))
+        }
+        
       }
     },
     closeFullScreenPlayer: () => {
       if (viewRef.current) {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.closeFullScreenPlayer.toString(),
-          null
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.closeFullScreenPlayer.toString(),
+            null
+          );
+        } else {
+          AgnoPlay.nativeModule.closeFullScreenPlayer(findNodeHandle(viewRef.current))
+        }
+        
       }
     },
     seekTo: (position) => {
       if (viewRef.current) {
-        console.log('inside seekTo:', position)
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(viewRef.current),
-          UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.seekTo.toString(),
-          [position]
-        );
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.seekTo.toString(),
+            [position]
+          );
+        } else {
+          AgnoPlay.nativeModule.seekTo(position, findNodeHandle(viewRef.current))
+        }
+        
       }
     }
   }));

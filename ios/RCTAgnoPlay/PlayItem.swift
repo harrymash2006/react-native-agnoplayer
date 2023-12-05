@@ -17,7 +17,7 @@ struct PlayItem {
     var skipAds: Bool?
     var muteOnAutoPlay: Bool?
     var fullScreen: Bool?
-    var startOffset: Int64?
+    var startOffset: Double?
     var playSkinColor: String?
     var playButtonBackgroundColor: String?
     var autoPlay: Bool?
@@ -48,7 +48,7 @@ struct PlayItem {
         skipAds = data["skipAds"] as? Bool
         muteOnAutoPlay = data["muteOnAutoPlay"] as? Bool
         fullScreen = data["isFullScreen"] as? Bool
-        startOffset = data["startOffset"] as? Int64
+        startOffset = data["startOffset"] as? Double
         playSkinColor = data["playSkinColor"] as? String
         playButtonBackgroundColor = data["playButtonBackgroundColor"] as? String
         autoPlay = data["autoPlay"] as? Bool

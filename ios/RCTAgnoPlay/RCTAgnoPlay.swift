@@ -222,7 +222,7 @@ class RCTAgnoPlay: UIView {
       playerViewController = AgnoplayerViewController.create(playerItem: item, delegate: nil, reporter: nil, expandedPlayerPresentationStyle: .pageSheet)
       playerViewController?.isPipEnabled = false
       if let timeMicroseconds = playerConfig.startOffset {
-          let cmTime = CMTime(value: CMTimeValue(timeMicroseconds), timescale: 1000000)
+          let cmTime = CMTime(value: CMTimeValue(timeMicroseconds), timescale: 1)
           playerViewController?.player?.seek(to: cmTime)
           if (!(playerConfig.autoPlay ?? false)) {
               playerViewController?.player?.pause()
@@ -252,7 +252,7 @@ class RCTAgnoPlay: UIView {
   
   func closeFullScreenPlayer() {
       playerViewController?.modalPresentationStyle = .pageSheet
-      onFullScreen?(getFullScreenData(isFullScreen: false))
+      onFullScreen?(getFullScreenData(isFullScreen: false, identifier: "0"))
   }
     
   @objc func sendEvent(data: Dictionary<String,Any>) {
@@ -263,10 +263,11 @@ class RCTAgnoPlay: UIView {
       )
   }
     
-  func getFullScreenData(isFullScreen: Bool) -> Dictionary<String, Any> {
+  func getFullScreenData(isFullScreen: Bool, identifier: String) -> Dictionary<String, Any> {
         let cmTime = CMTime(value: CMTimeValue(0), timescale: 1000000)
         return ["isFullScreenRequested": isFullScreen,
             "sessionKey": _sessionKey,
+             "identifier": identifier,
             "isPlaying": playerViewController?.player?.isPlaying,
             "imageUrl": playerViewController?.playerItem?.posterURL?.absoluteString,
             "target": self.reactTag,
@@ -282,19 +283,30 @@ class RCTAgnoPlay: UIView {
   }
   
   func seekTo(_ position: NSNumber) {
-      let cmTime = CMTime(value: CMTimeValue(truncating: position), timescale: 1000000)
+      let cmTime = CMTime(value: CMTimeValue(truncating: position), timescale: 1)
       playerViewController?.player?.seek(to: cmTime)
   }
     
   @objc private func enterFullScreen(_ notification:Notification) {
         // full screen layout change here
-      onFullScreen?(getFullScreenData(isFullScreen: true))
+      var _mediaId = "0"
+      if let userInfo = notification.userInfo {
+              // Access data using keys
+          if let mediaId = userInfo["mediaId"] as? String {
+              // Handle the value
+              print("mediaId:::: \(mediaId)")
+              _mediaId = mediaId
+          }
+          // Access more data as needed
+      }
+      
+      onFullScreen?(getFullScreenData(isFullScreen: true, identifier: _mediaId))
       //sendEvent(data: getFullScreenData(isFullScreen: true))
   }
 
   @objc private func exitFullScreen(_ notification:Notification) {
         // non full screen layout change here
-      onFullScreen?(getFullScreenData(isFullScreen: false))
+      onFullScreen?(getFullScreenData(isFullScreen: false, identifier: "0"))
   }
   
   @objc func applicationWillResignActive(notification:NSNotification!) {
