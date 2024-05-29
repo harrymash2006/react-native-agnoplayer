@@ -30,6 +30,11 @@ export type ConfigProperties = {
     imageUrl: string;
   }>;
 
+  export type onLoadData = Readonly<{
+    duration: string;
+    sessionKey: string;
+  }>;
+
   export type ConfigProps = Readonly<
   ConfigProperties | NodeRequire
 >;

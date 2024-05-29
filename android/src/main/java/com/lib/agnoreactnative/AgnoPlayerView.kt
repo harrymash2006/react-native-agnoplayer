@@ -233,6 +233,10 @@ class AgnoPlayerView @JvmOverloads constructor(
 
     override fun onPlayerStateChange(state: Int) {
         Log.i("AgnoPlayerInfo", "AgnoPlayerr::$state")
+        if (state == 1) {
+            // ready to play
+            onLoad()
+        }
     }
 
     fun onResume() {
@@ -246,6 +250,13 @@ class AgnoPlayerView @JvmOverloads constructor(
         } else {
             //exitFullScreen()
         }
+    }
+
+    private fun getPlayerData(): WritableMap {
+        val payload = Arguments.createMap()
+        payload.putString("duration", mediaPlayer?.getDuration().toString())
+        payload.putString("sessionKey", videoIdentifier)
+        return payload
     }
 
     private fun getFullScreenEventData(isFullScreen: Boolean): WritableMap {
@@ -284,6 +295,10 @@ class AgnoPlayerView @JvmOverloads constructor(
         mediaPlayer?.seekTo(position.toLong())
     }
 
+    fun shouldMuteAudio(shouldMute: Boolean) {
+        mediaPlayer?.setMuted(shouldMute)
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     fun lockToPortrait() {
         val constraintSet = ConstraintSet()
@@ -309,5 +324,9 @@ class AgnoPlayerView @JvmOverloads constructor(
         exitFullScreen()
         lockToPortrait()
         sendEvent("onFullScreen", "isFullScreenRequested", getFullScreenEventData(false))
+    }
+
+    fun onLoad() {
+        sendEvent("onLoad", "onLoadPlayer", getPlayerData())
     }
 }

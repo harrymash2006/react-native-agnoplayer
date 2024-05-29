@@ -16,6 +16,7 @@ RCT_EXPORT_VIEW_PROPERTY(brand, NSString);
 RCT_EXPORT_VIEW_PROPERTY(videoId, NSString);
 RCT_EXPORT_VIEW_PROPERTY(url, NSString);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock);
 
 /*RCT_EXPORT_VIEW_PROPERTY(itemTitle, NSString);
 RCT_EXPORT_VIEW_PROPERTY(autoPlay, BOOL);
@@ -44,6 +45,9 @@ RCT_EXTERN_METHOD(lockToPortrait:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(lockToLandscape:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(seekTo:(nonnull NSNumber *)seek
                  reactTag:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(shouldMuteAudio:(BOOL)shouldMute
+                 reactTag:(nonnull NSNumber *)reactTag)
+
 
 /*-(void) publishOnFullScreenEvent:(NSDictionary *) body {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

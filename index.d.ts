@@ -10,6 +10,7 @@ interface AgnoPlayerViewProps {
   style?: ViewStyle;
   playerConfig?: ConfigProperties;
   onFullScreen?: (e: OnFullScreenData) => void;
+  onLoad?: (e: onLoadData) => void;
 }
 
 export interface AgnoPlayNativeModule {
@@ -23,7 +24,8 @@ export interface AgnoPlayerViewRef {
   seekTo: (position: number) => void,
   closeFullScreenPlayer: () => void,
   lockToPortrait: () => void,
-  lockToLandscape: () => void
+  lockToLandscape: () => void,
+  shouldMuteAudio: () => void
 }
 
 export default class AgnoPlayerViewModule extends Component<AgnoPlayerViewProps> {}

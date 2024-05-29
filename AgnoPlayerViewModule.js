@@ -5,7 +5,7 @@ import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 import AgnoPlay from './AgnoPlayerNativeModule';
 const AgnoPlayerView = requireNativeComponent('RCTAgnoPlay');
 
-const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, showAds, playerConfig, onFullScreen, style }, ref) => {
+const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, showAds, playerConfig, onFullScreen, onLoad, style }, ref) => {
   const viewRef = useRef(null);
 
   useEffect(() => {
@@ -20,11 +20,26 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
     };
 
     AgnoPlay.emitter.addListener('onFullScreen', onFullScreenListener);
+    AgnoPlay.emitter.addListener('onLoad', onPlayerLoad);
+
 
     return () => {
         AgnoPlay.emitter.removeAllListeners('onFullScreen')
+        AgnoPlay.emitter.removeAllListeners('onLoad')
     };
   });
+
+  const onPlayerLoad = (data) => {
+    console.log('onLoad::', data)
+    if (Platform.OS === 'ios' && onLoad && data && data.sessionKey == sessionKey) {
+      onLoad(data)
+    } else if (Platform.OS === 'android') {
+      const playerData = data.data
+      if (playerData && onLoad && playerData.sessionKey == sessionKey) {
+        onLoad(playerData)
+      }
+    }
+  }
 
   const onFullScreenEventIOS = (data) => {
       console.log('onFullScreenEventIOS:', data)
@@ -119,6 +134,20 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
         }
         
       }
+    },
+    shouldMuteAudio: (value) => {
+      if (viewRef.current) {
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.shouldMuteAudio.toString(),
+            [value]
+          );
+        } else {
+          AgnoPlay.nativeModule.shouldMuteAudio(value, findNodeHandle(viewRef.current))
+        }
+        
+      }
     }
   }));
   
@@ -126,6 +155,7 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
     <AgnoPlayerView
       ref={viewRef}
       onFullScreen={(data) => onFullScreenEventIOS(data?.nativeEvent)}
+      onLoad={(data) => onPlayerLoad(data?.nativeEvent)}
       {...{ sessionKey, brand, videoId, url, showAds, playerConfig, style }}
     />
   );

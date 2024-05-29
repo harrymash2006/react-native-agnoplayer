@@ -13,7 +13,7 @@
 RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[@"onFullScreen"];
+    return @[@"onFullScreen", @"onLoad"];
 }
 
 - (void)startObserving{
@@ -21,6 +21,19 @@ RCT_EXPORT_MODULE();
                 selector:@selector(receiveonFullScreenNotification:)
                 name:@"onFullScreen"
                 object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                selector:@selector(receiveonLoadNotification:)
+                name:@"onLoad"
+                object:nil];
+}
+
+-(void) receiveonLoadNotification:(NSNotification *) notification {
+    NSDictionary *userInfo = notification.userInfo;
+    if ([[notification name] isEqualToString:@"onLoad"]){
+        if(userInfo!=nil){
+            [self sendEventWithName:@"onLoad" body:userInfo];
+        }
+    }
 }
 
 -(void) receiveonFullScreenNotification:(NSNotification *) notification {

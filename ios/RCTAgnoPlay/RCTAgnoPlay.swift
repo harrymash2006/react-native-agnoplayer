@@ -10,7 +10,12 @@ import React
 import AVFoundation
 import AgnoplayerSDK
     
-class RCTAgnoPlay: UIView {
+class RCTAgnoPlay: UIView, PlayerStateDelegate {
+    
+    
+    func onReadyToPlay() { 
+        onLoadPlayer()
+    }
   
   private var _sessionKey: String = ""
   private var _brand: String = "agnoplay"
@@ -22,6 +27,7 @@ class RCTAgnoPlay: UIView {
     
   // Events
   @objc var onFullScreen: RCTDirectEventBlock?
+  @objc var onLoad: RCTDirectEventBlock?
 
   @objc
   func setPlayerConfig(_ playerConfig:NSDictionary!) {
@@ -220,6 +226,7 @@ class RCTAgnoPlay: UIView {
     
     private func createOrUpdatePlayerWith(_ item: PlayerItem, playerConfig: PlayItem) {
       playerViewController = AgnoplayerViewController.create(playerItem: item, delegate: nil, reporter: nil, expandedPlayerPresentationStyle: .pageSheet)
+      playerViewController?.player?.playerStateDelegate = self
       playerViewController?.isPipEnabled = false
       if let timeMicroseconds = playerConfig.startOffset {
           let cmTime = CMTime(value: CMTimeValue(timeMicroseconds), timescale: 1)
@@ -255,6 +262,14 @@ class RCTAgnoPlay: UIView {
       onFullScreen?(getFullScreenData(isFullScreen: false, identifier: "0"))
   }
     
+  func onLoadPlayer() {
+      let data = ["duration": (playerViewController?.player?.currentDuration.seconds ?? 0) * 1000,
+                  "sessionKey": _sessionKey] as [String : Any];
+      if let onLoad = onLoad {
+          onLoad(data)
+      }
+  }
+    
   @objc func sendEvent(data: Dictionary<String,Any>) {
       NotificationCenter.default.post(
           name: Notification.Name("onFullScreen"),
@@ -285,6 +300,10 @@ class RCTAgnoPlay: UIView {
   func seekTo(_ position: NSNumber) {
       let cmTime = CMTime(value: CMTimeValue(truncating: position), timescale: 1)
       playerViewController?.player?.seek(to: cmTime)
+  }
+    
+  func shouldMuteAudio(_ shouldMute: Bool) {
+    playerViewController?.player?.isMuted = shouldMute
   }
     
   @objc private func enterFullScreen(_ notification:Notification) {
