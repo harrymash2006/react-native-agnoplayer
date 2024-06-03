@@ -25,6 +25,10 @@ RCT_EXPORT_MODULE();
                 selector:@selector(receiveonLoadNotification:)
                 name:@"onLoad"
                 object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                selector:@selector(receiveonPlayerStateChangedNotification:)
+                name:@"onPlayerStateChanged"
+                object:nil];
 }
 
 -(void) receiveonLoadNotification:(NSNotification *) notification {
@@ -32,6 +36,15 @@ RCT_EXPORT_MODULE();
     if ([[notification name] isEqualToString:@"onLoad"]){
         if(userInfo!=nil){
             [self sendEventWithName:@"onLoad" body:userInfo];
+        }
+    }
+}
+
+-(void) receiveonPlayerStateChangedNotification:(NSNotification *) notification {
+    NSDictionary *userInfo = notification.userInfo;
+    if ([[notification name] isEqualToString:@"onPlayerStateChanged"]){
+        if(userInfo!=nil){
+            [self sendEventWithName:@"onPlayerStateChanged" body:userInfo];
         }
     }
 }

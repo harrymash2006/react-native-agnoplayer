@@ -17,6 +17,7 @@ RCT_EXPORT_VIEW_PROPERTY(videoId, NSString);
 RCT_EXPORT_VIEW_PROPERTY(url, NSString);
 RCT_EXPORT_VIEW_PROPERTY(onFullScreen, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onLoad, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onPlayerStateChanged, RCTDirectEventBlock);
 
 /*RCT_EXPORT_VIEW_PROPERTY(itemTitle, NSString);
 RCT_EXPORT_VIEW_PROPERTY(autoPlay, BOOL);

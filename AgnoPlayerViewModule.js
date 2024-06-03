@@ -5,7 +5,7 @@ import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 import AgnoPlay from './AgnoPlayerNativeModule';
 const AgnoPlayerView = requireNativeComponent('RCTAgnoPlay');
 
-const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, showAds, playerConfig, onFullScreen, onLoad, style }, ref) => {
+const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, showAds, playerConfig, onFullScreen, onLoad, onPlayerStateChanged, style, onPipModeChanged }, ref) => {
   const viewRef = useRef(null);
 
   useEffect(() => {
@@ -21,13 +21,36 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
 
     AgnoPlay.emitter.addListener('onFullScreen', onFullScreenListener);
     AgnoPlay.emitter.addListener('onLoad', onPlayerLoad);
+    AgnoPlay.emitter.addListener('onPlayerStateChanged', onPlayerStateUpdated);
+    AgnoPlay.emitter.addListener('onPipModeChanged', onPictureInPictureChanged);
 
 
     return () => {
         AgnoPlay.emitter.removeAllListeners('onFullScreen')
         AgnoPlay.emitter.removeAllListeners('onLoad')
+        AgnoPlay.emitter.removeAllListeners('onPlayerStateChanged')
+        AgnoPlay.emitter.removeAllListeners('onPipModeChanged')
     };
   });
+
+  const onPictureInPictureChanged = (state) => {
+    console.log('onPictureInPictureChanged::', state)
+    if (onPipModeChanged) {
+      onPipModeChanged(state)
+    }
+  }
+
+  const onPlayerStateUpdated = (data) => {
+    console.log('onPlayerStateChanged::', data)
+    if (Platform.OS === 'ios' && onPlayerStateChanged && data && data.sessionKey == sessionKey) {
+      onPlayerStateChanged(data)
+    } else if (Platform.OS === 'android') {
+      const stateData = data.data
+      if (stateData && onPlayerStateChanged && stateData.sessionKey == sessionKey) {
+        onPlayerStateChanged(stateData)
+      }
+    }
+  }
 
   const onPlayerLoad = (data) => {
     console.log('onLoad::', data)
@@ -61,6 +84,23 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
           );
         } else {
           AgnoPlay.nativeModule.play(findNodeHandle(viewRef.current))
+        }
+        
+      }
+    },
+    enterPipMode: () => {
+      AgnoPlay.nativeModule.enterPipMode();
+    },
+    changePipMode: (pipMode) => {
+      if (viewRef.current) {
+        if (Platform.OS === 'android') {
+          UIManager.dispatchViewManagerCommand(
+            findNodeHandle(viewRef.current),
+            UIManager.getViewManagerConfig('RCTAgnoPlay').Commands.changePipMode.toString(),
+            [pipMode]
+          );
+        } else {
+          AgnoPlay.nativeModule.changePipMode(pipMode, findNodeHandle(viewRef.current))
         }
         
       }
@@ -156,6 +196,7 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
       ref={viewRef}
       onFullScreen={(data) => onFullScreenEventIOS(data?.nativeEvent)}
       onLoad={(data) => onPlayerLoad(data?.nativeEvent)}
+      onPlayerStateChanged={(data) => onPlayerStateUpdated(data?.nativeEvent)}
       {...{ sessionKey, brand, videoId, url, showAds, playerConfig, style }}
     />
   );

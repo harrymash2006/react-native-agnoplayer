@@ -12,5 +12,6 @@
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:player_background_color="@color/black"
+        app:layout_constraintDimensionRatio="H,9:16"
         app:progress_bar_color="@color/red" />
 </androidx.constraintlayout.widget.ConstraintLayout>

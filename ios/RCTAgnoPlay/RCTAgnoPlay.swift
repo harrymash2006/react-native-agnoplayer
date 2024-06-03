@@ -10,12 +10,7 @@ import React
 import AVFoundation
 import AgnoplayerSDK
     
-class RCTAgnoPlay: UIView, PlayerStateDelegate {
-    
-    
-    func onReadyToPlay() { 
-        onLoadPlayer()
-    }
+class RCTAgnoPlay: UIView {
   
   private var _sessionKey: String = ""
   private var _brand: String = "agnoplay"
@@ -28,7 +23,8 @@ class RCTAgnoPlay: UIView, PlayerStateDelegate {
   // Events
   @objc var onFullScreen: RCTDirectEventBlock?
   @objc var onLoad: RCTDirectEventBlock?
-
+  @objc var onPlayerStateChanged: RCTDirectEventBlock?
+    
   @objc
   func setPlayerConfig(_ playerConfig:NSDictionary!) {
     _playerItem = PlayItem.init(playerConfig)
@@ -182,6 +178,8 @@ class RCTAgnoPlay: UIView, PlayerStateDelegate {
               guard let self = self else { return }
               
               var modifiedItem = playerItem
+              //modifiedItem.identifier = _sessionKey
+              modifiedItem.loop = playerConfig.loop ?? false
               modifiedItem.showShareButton = playerConfig.showShareButton ?? false
               modifiedItem.autoplay = playerConfig.autoPlay
               modifiedItem.muteOnAutoplay = playerConfig.muteOnAutoPlay ?? true
@@ -225,7 +223,8 @@ class RCTAgnoPlay: UIView, PlayerStateDelegate {
   }
     
     private func createOrUpdatePlayerWith(_ item: PlayerItem, playerConfig: PlayItem) {
-      playerViewController = AgnoplayerViewController.create(playerItem: item, delegate: nil, reporter: nil, expandedPlayerPresentationStyle: .pageSheet)
+      let reporter = AnalyticsReporter(providers: [EventStorageProvider(delegate: self)])
+      playerViewController = AgnoplayerViewController.create(playerItem: item, delegate: nil, reporter: reporter, expandedPlayerPresentationStyle: .pageSheet)
       playerViewController?.player?.playerStateDelegate = self
       playerViewController?.isPipEnabled = false
       if let timeMicroseconds = playerConfig.startOffset {
@@ -264,11 +263,19 @@ class RCTAgnoPlay: UIView, PlayerStateDelegate {
     
   func onLoadPlayer() {
       let data = ["duration": (playerViewController?.player?.currentDuration.seconds ?? 0) * 1000,
-                  "sessionKey": _sessionKey] as [String : Any];
+                  "sessionKey": _sessionKey] as [String : Any]
       if let onLoad = onLoad {
           onLoad(data)
       }
   }
+    
+    func onPlayerStateUpdated(state: String) {
+        let data = ["state": state,
+                    "sessionKey": _sessionKey] as [String : Any]
+        if let onPlayerStateChanged = onPlayerStateChanged {
+            onPlayerStateChanged(data)
+        }
+    }
     
   @objc func sendEvent(data: Dictionary<String,Any>) {
       NotificationCenter.default.post(
@@ -343,6 +350,30 @@ class RCTAgnoPlay: UIView, PlayerStateDelegate {
     
   }
   
+}
+
+extension RCTAgnoPlay: PlayerStateDelegate {
+    func onPlayerStateChanged(state: String) {
+        if state == "STATE_READY" {
+            onLoadPlayer()
+        }
+        onPlayerStateUpdated(state: state)
+    }
+    
+    
+}
+
+extension RCTAgnoPlay: EventStorageProviderDelegate {
+    func onEvent(event: AnalyticsEvent) {
+        print("event logged::", event)
+        if ((event == .ended || event == .percent100)/* && playerViewController?.playerItem?.identifier == _sessionKey*/) {
+            onPlayerStateUpdated(state: "STATE_END")
+        }
+    }
+
+    func eventsCleared() {
+        
+    }
 }
 
 enum LicenseConfig: String, Codable {

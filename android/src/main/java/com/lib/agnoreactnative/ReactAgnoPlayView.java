@@ -132,6 +132,10 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
         agnoPlayerView.shouldMuteAudio(value);
     }
 
+    public void updatePipMode(boolean value) {
+        agnoPlayerView.onPipChanged(value);
+    }
+
     public void lockToPortrait() {
         agnoPlayerView.lockToPortrait();
     }

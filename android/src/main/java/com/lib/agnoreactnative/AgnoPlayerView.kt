@@ -10,8 +10,11 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.OrientationEventListener
 import android.widget.LinearLayout
+import android.widget.Switch
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import com.egeniq.agno.agnoplayer.analytics.AnalyticsEventListener
+import com.egeniq.agno.agnoplayer.analytics.Event
 import com.egeniq.agno.agnoplayer.content.LicenseError
 import com.egeniq.agno.agnoplayer.data.model.PlayerItem
 import com.egeniq.agno.agnoplayer.player.AgnoErrorListener
@@ -19,6 +22,7 @@ import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayer
 import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayerFactory
 import com.egeniq.agno.agnoplayer.player.AgnoPlayerStateListener
 import com.egeniq.agno.agnoplayer.player.LogLevel
+import com.egeniq.agno.agnoplayer.player.PlayerItemHolder
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
@@ -32,7 +36,8 @@ class AgnoPlayerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), AgnoErrorListener, AgnoPlayerStateListener {
+) : LinearLayout(context, attrs, defStyleAttr), AgnoErrorListener, AgnoPlayerStateListener,
+    AnalyticsEventListener {
 
     private var nativeModule: AgnoPlayBridgeModule? = null
     private val coroutineScope = CustomViewCoroutineScope()
@@ -45,7 +50,7 @@ class AgnoPlayerView @JvmOverloads constructor(
     private var orientationEventListener: OrientationEventListener? = null
     private var currentActivity: Activity? = null
     private var videoIdentifier: String? = null
-
+    private var sessionKey = ""
     init {
         inflate(context, R.layout.activity_stream, this)
         agnoPlayerView = findViewById(R.id.agno_player_view)
@@ -81,6 +86,9 @@ class AgnoPlayerView @JvmOverloads constructor(
     ) {
         this.nativeModule = nativeModule
         this.videoIdentifier = playerItem.sessionKey
+        if (playerItem.sessionKey != null) {
+            sessionKey = playerItem.sessionKey!!
+        }
         this.currentActivity = activity
         Log.e("mediaplayer", "mediaplayerinitialized")
         mediaPlayer = AgnoMediaPlayerFactory.getMediaPlayer(
@@ -95,6 +103,7 @@ class AgnoPlayerView @JvmOverloads constructor(
 
         mediaPlayer?.addErrorListener(this)
         mediaPlayer?.addPlayerStateListener(this)
+        mediaPlayer?.addAnalyticsListener(this)
         mediaPlayer?.setFullScreenRequestedCallback { inFullScreen ->
             /*activity.requestedOrientation = if (inFullScreen) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -145,6 +154,7 @@ class AgnoPlayerView @JvmOverloads constructor(
                         item?.showShareButton = playerItem.showShareButton == true
                     }?.copy(autoplay = playerItem.autoPlay,
                         startOffset = playerItem.startOffset,
+                        identifier = sessionKey,
                         itemTitle = playerItem.title, muteOnAutoplay = playerItem.muteOnAutoPlay,
                         playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
                         playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
@@ -156,7 +166,6 @@ class AgnoPlayerView @JvmOverloads constructor(
                     lockToLandscape()
                     enterFullScreen()
                 }
-
                 playContent(playerItemFromList)
             } catch (ex: Exception) {
                 showError(ex)
@@ -237,6 +246,7 @@ class AgnoPlayerView @JvmOverloads constructor(
             // ready to play
             onLoad()
         }
+        onPlayerStateUpdate(state)
     }
 
     fun onResume() {
@@ -326,7 +336,37 @@ class AgnoPlayerView @JvmOverloads constructor(
         sendEvent("onFullScreen", "isFullScreenRequested", getFullScreenEventData(false))
     }
 
-    fun onLoad() {
+    private fun onLoad() {
         sendEvent("onLoad", "onLoadPlayer", getPlayerData())
+    }
+
+    private fun onPlayerStateUpdate(state: Int) {
+        val payload = Arguments.createMap()
+        payload.putString("state", returnState(state))
+        payload.putString("sessionKey", videoIdentifier)
+        sendEvent("onPlayerStateChanged", "onPlayerStateChanged", payload)
+    }
+
+    private fun returnState(state: Int): String {
+        when (state) {
+            0 -> return "STATE_IDLE"
+            1 -> return "STATE_READY"
+            2 -> return "STATE_BUFFERING"
+            3 -> return "STATE_PLAYING"
+            4 -> return "STATE_END"
+            else -> return "STATE_UNKNOWN"
+        }
+    }
+
+    override fun onEvent(event: Event, playerItemHolder: PlayerItemHolder) {
+        println("onEvent::"+ event.name)
+        println("playerItemHolder::"+ playerItemHolder.playerItem?.identifier)
+        if (playerItemHolder.playerItem?.identifier == sessionKey && (event.name == "ended" || event.name == "100-percent")) {
+            onPlayerStateUpdate(4)
+        }
+    }
+
+    fun onPipChanged(value: Boolean) {
+        mediaPlayer?.onPictureInPictureModeChanged(value)
     }
 }

@@ -35,6 +35,11 @@ export type ConfigProperties = {
     sessionKey: string;
   }>;
 
+  export type PlayerStateData = Readonly<{
+    state: string;
+    sessionKey: string;
+  }>;
+
   export type ConfigProps = Readonly<
   ConfigProperties | NodeRequire
 >;

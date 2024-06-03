@@ -51,6 +51,8 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final int COMMAND_PAUSE_ID = 2;
     private static final String COMMAND_SEEK_NAME = "seekTo";
     private static final String COMMAND_SETVOLUME_NAME = "shouldMuteAudio";
+    private static final String COMMAND_CHANGEPIP_NAME = "changePipMode";
+    private static final int COMMAND_CHANGEPIP_ID = 8;
 
     private static final int COMMAND_SEEK_ID = 3;
     private static final int COMMAND_SETVOLUME_NAME_ID = 7;
@@ -132,13 +134,16 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        return MapBuilder.of(COMMAND_PLAY_NAME, COMMAND_PLAY_ID,
+        Map<String, Integer> map = MapBuilder.of(COMMAND_PLAY_NAME, COMMAND_PLAY_ID,
                 COMMAND_PAUSE_NAME, COMMAND_PAUSE_ID,
                 COMMAND_SEEK_NAME, COMMAND_SEEK_ID,
                 COMMAND_SETVOLUME_NAME, COMMAND_SETVOLUME_NAME_ID,
                 COMMAND_PORTRAIT_NAME, COMMAND_PORTRAIT_ID,
                 COMMAND_LANDSCAPE_NAME, COMMAND_LANDSCAPE_ID,
                 COMMAND_CLOSEFULLSCREEN_NAME, COMMAND_CLOSEFULLSCREEN_ID);
+        map.put(COMMAND_CHANGEPIP_NAME, COMMAND_CHANGEPIP_ID);
+        return map;
+
     }
 
     @Override
@@ -154,6 +159,10 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
             case COMMAND_SEEK_ID:
                 assert args != null;
                 root.seekTo(args.getInt(0));
+                break;
+            case COMMAND_CHANGEPIP_ID:
+                assert args != null;
+                root.updatePipMode(args.getBoolean(0));
                 break;
             case COMMAND_SETVOLUME_NAME_ID:
                 assert args != null;
