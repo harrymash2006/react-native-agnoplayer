@@ -124,53 +124,9 @@ class RCTAgnoPlay: UIView {
   }
   
   func initializePlayer() {
-      Agnoplayer.setLicenseCheckBaseURL(Config.environment.licenseCheckBaseURL)
-      
-      Agnoplayer.setBaseURL(Config.environment.baseURL)
-      
       if let playerConfig = _playerItem {
-          
-          /*var agnoPlayerItem = PlayerItem(title: playerConfig.title ?? "",
-                                          identifier: _url ?? "",
-                                          mediaId: playerConfig.videoId, 
-                                          autoplay: playerConfig.autoPlay,
-                                          playerSkinColor: playerConfig.playSkinColor,
-                                          playButtonBackgroundColor: playerConfig.playButtonBackgroundColor ?? "#ffffff", 
-                                          skipAds: playerConfig.skipAds,
-                                          muxId: playerConfig.muxId,
-                                          showTitle: playerConfig.showTitle, 
-                                          showPlayButtonOnPause: playerConfig.showPlayButtonOnPause,
-                                          chromecastEnabled: playerConfig.chromecastEnabled,
-                                          airplayEnabled: playerConfig.chromecastEnabled,
-                                          audioPlayerBackgroundColor: playerConfig.playSkinColor,
-                                          googleAnalyticsEnabled: playerConfig.googleAnalyticsEnabled ?? false,
-                                          googleAnalyticsId: playerConfig.googleAnalyticsId, 
-                                          muteOnAutoplay: playerConfig.muteOnAutoPlay ?? true,
-                                          brandImage: _brand
-                                        )
-          if let url = playerConfig.posterURL.flatMap({ URL(string: $0) }) {
-              agnoPlayerItem.posterURL = url
-          }
-          agnoPlayerItem.loop = playerConfig.loop ?? false
-          
-          if playerConfig.showAds ?? false {
-              agnoPlayerItem.vastURL = playerConfig.adTag
-          }
-          
-          if (playerConfig.fullScreen ?? false) {
-              
-          }
-          playerViewController = AgnoplayerViewController.create(playerItem: agnoPlayerItem, delegate: nil, reporter: nil, expandedPlayerPresentationStyle: .pageSheet)
-          playerViewController?.isPipEnabled = false
-          if let timeMicroseconds = playerConfig.startOffset {
-              let cmTime = CMTime(value: CMTimeValue(timeMicroseconds), timescale: 1000000)
-              playerViewController?.player?.seek(to: cmTime)
-          }
-          guard let playerViewController = playerViewController else { return }
-          playerViewController.view.frame = self.bounds
-          addSubview(playerViewController.view)*/
-          
           Agnoplayer.getPlayerItem(brand: _brand,
+                                   type: getAssetType(playerConfig.assetType),
                                    id: _videoId,
                                    preferredProtocol: nil,
                                    cimData: nil,
@@ -180,6 +136,7 @@ class RCTAgnoPlay: UIView {
               var modifiedItem = playerItem
               //modifiedItem.identifier = _sessionKey
               modifiedItem.loop = playerConfig.loop ?? false
+              modifiedItem.hideControls = playerConfig.hideControls
               modifiedItem.showShareButton = playerConfig.showShareButton ?? false
               modifiedItem.autoplay = playerConfig.autoPlay
               modifiedItem.muteOnAutoplay = playerConfig.muteOnAutoPlay ?? true
@@ -187,8 +144,6 @@ class RCTAgnoPlay: UIView {
               modifiedItem.itemTitle = playerConfig.title
               modifiedItem.playButtonBackgroundColor = playerConfig.playButtonBackgroundColor ?? "#0000FF"
               modifiedItem.showTitle = playerConfig.showTitle
-              modifiedItem.googleAnalyticsId = playerConfig.googleAnalyticsId
-              modifiedItem.googleAnalyticsEnabled = playerConfig.googleAnalyticsEnabled
               
               if let url = playerConfig.posterURL.flatMap({ URL(string: $0) }) {
                   modifiedItem.posterURL = url
@@ -221,6 +176,21 @@ class RCTAgnoPlay: UIView {
       }
       
   }
+    
+    private func getAssetType(_ type: String?) -> AssetSourceType {
+        switch type {
+        case "VOD":
+            return AssetSourceType.vod
+        case "TTS":
+            return AssetSourceType.tts
+        case "LIVE":
+            return AssetSourceType.live
+        case "PODCAST":
+            return AssetSourceType.podcast
+        default:
+            return AssetSourceType.vod
+        }
+    }
     
     private func createOrUpdatePlayerWith(_ item: PlayerItem, playerConfig: PlayItem) {
       let reporter = AnalyticsReporter(providers: [EventStorageProvider(delegate: self)])

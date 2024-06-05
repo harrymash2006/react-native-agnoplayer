@@ -10,17 +10,18 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.OrientationEventListener
 import android.widget.LinearLayout
-import android.widget.Switch
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.egeniq.agno.agnoplayer.analytics.AnalyticsEventListener
 import com.egeniq.agno.agnoplayer.analytics.Event
 import com.egeniq.agno.agnoplayer.content.LicenseError
+import com.egeniq.agno.agnoplayer.data.model.AssetType
 import com.egeniq.agno.agnoplayer.data.model.PlayerItem
 import com.egeniq.agno.agnoplayer.player.AgnoErrorListener
 import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayer
 import com.egeniq.agno.agnoplayer.player.AgnoMediaPlayerFactory
 import com.egeniq.agno.agnoplayer.player.AgnoPlayerStateListener
+import com.egeniq.agno.agnoplayer.player.AssetSourceType
 import com.egeniq.agno.agnoplayer.player.LogLevel
 import com.egeniq.agno.agnoplayer.player.PlayerItemHolder
 import com.facebook.react.bridge.Arguments
@@ -100,7 +101,6 @@ class AgnoPlayerView @JvmOverloads constructor(
             miniPlayerView = null,
             logLevel = if (BuildConfig.DEBUG) LogLevel.DEBUG else null
         )
-
         mediaPlayer?.addErrorListener(this)
         mediaPlayer?.addPlayerStateListener(this)
         mediaPlayer?.addAnalyticsListener(this)
@@ -136,8 +136,7 @@ class AgnoPlayerView @JvmOverloads constructor(
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
                             advertTag = advertTag,
-                            baseUrl = getEnvironment().baseUrl,
-                            licenseBaseUrl = getEnvironment().licenseBaseUrl
+                            type = getAssetType(playerItem.assetType)
                         )
                     } else {
                         mediaPlayer?.getPlayerItemFromUrl(
@@ -146,21 +145,20 @@ class AgnoPlayerView @JvmOverloads constructor(
                             videoUrl = playerItem.url.orEmpty(),
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
-                            advertTag = advertTag,
-                            baseUrl = getEnvironment().baseUrl,
-                            licenseBaseUrl = getEnvironment().licenseBaseUrl
+                            type = getAssetType(playerItem.assetType)
                         )
                     }.also { item ->
                         item?.showShareButton = playerItem.showShareButton == true
                     }?.copy(autoplay = playerItem.autoPlay,
                         startOffset = playerItem.startOffset,
                         identifier = sessionKey,
+                        hideControls = playerItem.hideControls,
                         itemTitle = playerItem.title, muteOnAutoplay = playerItem.muteOnAutoPlay,
                         playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
                         playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
                         skipAds = playerItem.skipAds == true, muxId = playerItem.muxId, showTitle = playerItem.showTitle,
                         showPlayButtonOnPause = playerItem.showPlayButtonOnPause == true, chromecastEnabled = playerItem.chromecastEnabled,
-                        loop = playerItem.loop == true, googleAnalyticsEnabled = playerItem.googleAnalyticsEnabled, googleAnalyticsId = playerItem.googleAnalyticsId)
+                        loop = playerItem.loop == true)
 
                 if (playerItem.fullScreen == true) {
                     lockToLandscape()
@@ -170,6 +168,16 @@ class AgnoPlayerView @JvmOverloads constructor(
             } catch (ex: Exception) {
                 showError(ex)
             }
+        }
+    }
+
+    private fun getAssetType(type: String?): AssetSourceType {
+        return when (type) {
+            "VOD" -> AssetSourceType.VOD
+            "TTS" -> AssetSourceType.TTS
+            "LIVE" -> AssetSourceType.LIVE
+            "PODCAST" -> AssetSourceType.PODCAST
+            else -> AssetSourceType.VOD
         }
     }
 
@@ -250,7 +258,7 @@ class AgnoPlayerView @JvmOverloads constructor(
     }
 
     fun onResume() {
-        mediaPlayer?.bindToService(true)
+        // mediaPlayer?.bindToService(true) // commented this as per new Agno SDK
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

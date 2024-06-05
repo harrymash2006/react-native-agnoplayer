@@ -222,6 +222,8 @@ AgnoPlayerViewModule.propTypes = {
     playButtonBackgroundColor: PropTypes.string,
     hideProgressBarInAds: PropTypes.bool,
     skipAds: PropTypes.bool,
+    hideControls: PropTypes.bool,
+    assetType: PropTypes.string,
     muxId: PropTypes.string,
     showTitle: PropTypes.bool,
     showPlayButtonOnPause: PropTypes.bool,
@@ -248,6 +250,8 @@ AgnoPlayerViewModule.defaultProps = {
     posterURL: null,
     adTag: null,
     isFullScreen: false,
+    hideControls: false,
+    assetType: 'VOD',
     startOffset: 0,
     showTestAd: false,
     showAds: false,
@@ -264,5 +268,6 @@ AgnoPlayerViewModule.defaultProps = {
     googleAnalyticsId: null,
   },
 };
+
 
 export default AgnoPlayerViewModule

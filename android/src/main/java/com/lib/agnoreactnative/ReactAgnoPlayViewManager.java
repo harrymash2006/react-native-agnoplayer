@@ -22,6 +22,8 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final String PROP_URL = "url";
     private static final String PROP_TITLE = "itemTitle";
     private static final String PROP_AUTOPLAY = "autoPlay";
+    private static final String PROP_HIDECONTROLS = "hideControls";
+
     private static final String PROP_MUTEONAUTOPLAY = "muteOnAutoplay";
     private static final String PROP_PLAYERSKINCOLOR = "playerSkinColor";
     private static final String PROP_PLAYBUTTONBACKGROUNDCOLOR = "playButtonBackgroundColor";
@@ -40,6 +42,8 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final String PROP_GOOGLEANALYTICSID = "googleAnalyticsId";
 
     private static final String PROP_SHOWADS = "showAds";
+    private static final String PROP_ASSET_TYPE = "assetType";
+
     private static final String PROP_ISFULLSCREEN = "isFullScreen";
     private static final String PROP_STARTOFFSET = "startOffset";
 
@@ -103,7 +107,9 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     public void setPlayerConfig(final ReactAgnoPlayView view, @Nullable ReadableMap playerConfig) {
         PlayItem playItem = new PlayItem();
         playItem.setTitle(ReactBridgeUtils.safeGetString(playerConfig, PROP_TITLE, null));
+        playItem.setAssetType(ReactBridgeUtils.safeGetString(playerConfig, PROP_ASSET_TYPE, "VOD"));
         playItem.setShowAds(ReactBridgeUtils.safeGetBool(playerConfig, PROP_SHOWADS, false));
+        playItem.setHideControls(ReactBridgeUtils.safeGetBool(playerConfig, PROP_HIDECONTROLS, false));
         playItem.setStartOffset((long) ReactBridgeUtils.safeGetInt(playerConfig, PROP_STARTOFFSET, 0));
         playItem.setFullScreen(ReactBridgeUtils.safeGetBool(playerConfig, PROP_ISFULLSCREEN, false));
         playItem.setAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_AUTOPLAY, false));

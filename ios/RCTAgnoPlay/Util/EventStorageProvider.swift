@@ -11,6 +11,11 @@ import Foundation
 import AgnoplayerSDK
 
 class EventStorageProvider : AnalyticsProvider {
+    func report(event: AnalyticsEvent, playerItem: PlayerItem?) {
+        events.append(event)
+        delegate?.onEvent(event: event)
+    }
+    
     static let shared = EventStorageProvider(delegate: nil)
 
     weak var delegate: EventStorageProviderDelegate?
@@ -20,11 +25,6 @@ class EventStorageProvider : AnalyticsProvider {
     }
     
     public var events = [AnalyticsEvent]()
-    
-    func report(event: AnalyticsEvent) {
-        events.append(event)
-        delegate?.onEvent(event: event)
-    }
     
     public func clear() {
         events.removeAll()

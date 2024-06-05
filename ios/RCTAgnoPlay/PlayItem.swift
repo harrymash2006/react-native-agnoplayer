@@ -22,6 +22,8 @@ struct PlayItem {
     var playButtonBackgroundColor: String?
     var autoPlay: Bool?
     var posterURL: String?
+    var hideControls: Bool?
+    var assetType: String?
     var hideProgressBarInAds: Bool?
     var muxId: String?
     var showTitle: Bool?
@@ -41,10 +43,12 @@ struct PlayItem {
         brand = data["brand"] as? String
         title = data["title"] as? String
         videoId = data["videoId"] as? String
+        assetType = data["assetType"] as? String
         url = data["url"] as? String
         showTestAd = data["showTestAd"] as? Bool
         adTag = data["adTag"] as? String
         showAds = data["showAds"] as? Bool
+        hideControls = data["hideControls"] as? Bool
         skipAds = data["skipAds"] as? Bool
         muteOnAutoPlay = data["muteOnAutoPlay"] as? Bool
         fullScreen = data["isFullScreen"] as? Bool

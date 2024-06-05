@@ -11,10 +11,10 @@ Pod::Spec.new do |s|
   s.author         = package['author']
   s.homepage       = 'https://github.com/harrymash2006/react-native-agnoplayer'
   s.source       = { :git => "https://github.com/harrymash2006/react-native-agnoplayer.git", :tag => "v#{s.version}" }
-  s.ios.deployment_target = "13.4"
+  s.ios.deployment_target = "15.0"
   s.source_files = "ios/RCTAgnoPlay/**/*.{h,m,swift}"
   s.dependency "React-Core"
-  s.dependency 'AgnoplayerSDK', '3.1.0'
+  s.dependency 'AgnoplayerSDK', '5.1.3'
   s.static_framework = true
   s.xcconfig = {
     'OTHER_LDFLAGS': '-ObjC',

@@ -1,6 +1,8 @@
 package com.lib.agnoreactnative
 
 class PlayItem {
+    var assetType: String? = null
+    var hideControls: Boolean? = null
     var sessionKey: String? = null
     var brand: String? = null
     var title: String? = null

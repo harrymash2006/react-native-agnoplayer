@@ -12,6 +12,8 @@ export type ConfigProperties = {
     playButtonBackgroundColor?: string;
     hideProgressBarInAds?: boolean;
     skipAds?: boolean;
+    hideControls?:boolean;
+    assetType?:string;
     muxId?: string;
     showTitle?: boolean;
     showPlayButtonOnPause?: boolean;

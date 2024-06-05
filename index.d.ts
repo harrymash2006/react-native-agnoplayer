@@ -20,6 +20,12 @@ export interface AgnoPlayNativeModule {
   lockToLandscape: () => Promise<void>;
 }
 
+type SourceType = 
+    | 'VOD'
+    | 'TTS'
+    | 'LIVE'
+    | 'PODCAST';
+
 type PlayerState = 
     | 'STATE_IDLE'
     | 'STATE_READY'
@@ -28,14 +34,8 @@ type PlayerState =
     | 'STATE_END'
     | 'STATE_UNKNOWN';
 
-export const AgnoPlaybackState = {
-    STATE_IDLE: 'STATE_IDLE' as PlayerState,
-    STATE_READY: 'STATE_READY' as PlayerState,
-    STATE_BUFFERING: 'STATE_BUFFERING' as PlayerState,
-    STATE_PLAYING: 'STATE_PLAYING' as PlayerState,
-    STATE_END: 'STATE_END' as PlayerState,
-    STATE_UNKNOWN: 'STATE_UNKNOWN' as PlayerState,
-};
+export const AssetSourceType: { [key in SourceType]: key };
+export const AgnoPlaybackState: { [key in PlayerState]: key };
 
 export interface AgnoPlayerViewRef {
   play: () => void;
