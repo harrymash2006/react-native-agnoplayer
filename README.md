@@ -1,5 +1,3 @@
-Here is the formatted README file:
-
 ### AgnoPlayerView
 ================
 
@@ -194,8 +192,6 @@ Here are the configuration properties for the AgnoPlayerView:
 ### Error Handling
 -----------------
 
-Here are the error handling methods:
-
 | Method | Description |
 |--------|-------------|
 | `addErrorListener` | Add an error listener to the player |
@@ -205,8 +201,6 @@ Here are the error handling methods:
 ### Tracking Events
 -------------------
 
-Here are the tracking events:
-
 | Event | Description |
 |--------|-------------|
 | `onEvent` | Triggered when an event occurs |
@@ -214,8 +208,6 @@ Here are the tracking events:
 
 ### Playback State
 -----------------
-
-Here are the playback states:
 
 | State | Description |
 |--------|-------------|
@@ -228,8 +220,6 @@ Here are the playback states:
 ### Licenses
 -------------
 
-Here are the licenses:
-
 | License | Description |
 |--------|-------------|
 | `brand.hasLicense` | Check if the brand has a license |
@@ -237,57 +227,23 @@ Here are the licenses:
 ### Integrations
 ----------------
 
-Here are the integrations:
-
 | Integration | Description |
 |--------|-------------|
 | `Mux tracking` | Track events using Mux |
 | `Cim tracking` | Track events using Cim |
 | `Gemius` | Track events using Gemius |
 
-### Android Auto Support
--------------------------
-
-Here are the steps to add Android Auto support:
-
-1.  Create a `agnoplay-config.properties` file in your main `assets` folder.
-2.  Add the Android Auto brand, brand ID, and optional license key to the file.
-
-### Release Notes
------------------
-
-Here are the release notes:
-
-| Version | Description |
-|--------|-------------|
-| `3.0.0` | Initial release |
-| `3.1.0` | Added support for Android Auto |
-| `3.2.0` | Fixed bug with ad handling |
 
 ### Migration Guide
 -------------------
-
-Here are the migration steps:
 
 1.  Update your `package.json` file to include the new version.
 2.  Run `npm install` or `yarn install` to update your dependencies.
 3.  Update your code to use the new version.
 
-### Changelog
--------------
-
-Here are the changes:
-
-| Version | Description |
-|--------|-------------|
-| `3.0.0` | Initial release |
-| `3.1.0` | Added support for Android Auto |
-| `3.2.0` | Fixed bug with ad handling |
 
 ### Contributing
 -------------------
-
-Here are the contributing guidelines:
 
 1.  Fork the repository.
 2.  Create a new branch for your changes.
@@ -298,15 +254,11 @@ Here are the contributing guidelines:
 ### License
 -------------
 
-Here are the licensing terms:
-
 *   The AgnoPlayerView is licensed under the MIT License.
 *   You can use the AgnoPlayerView for free, but you must include the copyright notice in your application.
 *   You can modify the AgnoPlayerView, but you must include the copyright notice in your application.
 
 ### Contact
 -------------
-
-Here are the contact details:
 
 *   Email: harrymash2006@gmail.com
