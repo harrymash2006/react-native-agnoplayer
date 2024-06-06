@@ -95,31 +95,31 @@ export default App;
 
 ##### ConfigProperties
 
-| Property                      | Type    | Options         | Required |
-|-------------------------------|---------|-----------------|----------|
-| `itemTitle`                   | String  | -               | No       |
-| `autoPlay`                    | Boolean | -               | No       |
-| `isFullScreen`                | Boolean | -               | No       |
-| `startOffset`                 | Number  | -               | No       |
-| `muteOnAutoplay`              | Boolean | -               | No       |
-| `playerSkinColor`             | String  | Hex color code  | No       |
-| `posterURL`                   | String  | -               | No       |
-| `showAds`                     | Boolean | -               | No       |
-| `adTag`                       | String  | -               | No       |
-| `showTestAd`                  | Boolean | -               | No       |
-| `playButtonBackgroundColor`   | String  | Hex color code  | No       |
-| `hideProgressBarInAds`        | Boolean | -               | No       |
-| `skipAds`                     | Boolean | -               | No       |
-| `hideControls`                | Boolean | -               | No       |
-| `assetType`                   | String  | -               | No       |
-| `muxId`                       | String  | -               | No       |
-| `showTitle`                   | Boolean | -               | No       |
-| `showPlayButtonOnPause`       | Boolean | -               | No       |
-| `showShareButton`             | Boolean | -               | No       |
-| `chromecastEnabled`           | Boolean | -               | No       |
-| `loop`                        | Boolean | -               | No       |
-| `googleAnalyticsEnabled`      | Boolean | -               | No       |
-| `googleAnalyticsId`           | String  | -               | No       |
+| Property                      | Type    | Options         | Required | Default             |
+|-------------------------------|---------|-----------------|----------|---------------------|
+| `itemTitle`                   | String  | -               | No       | null                |
+| `autoPlay`                    | Boolean | -               | No       | false               |
+| `isFullScreen`                | Boolean | -               | No       | false               |
+| `startOffset`                 | Number  | -               | No       | 0                   |
+| `muteOnAutoplay`              | Boolean | -               | No       | true                |
+| `playerSkinColor`             | String  | Hex color code  | No       | '#FFFFFF'           |
+| `posterURL`                   | String  | -               | No       | null                |
+| `showAds`                     | Boolean | -               | No       | false               |
+| `adTag`                       | String  | -               | No       | null                |
+| `showTestAd`                  | Boolean | -               | No       | false               |
+| `playButtonBackgroundColor`   | String  | Hex color code  | No       | '#0000FF'           |
+| `hideProgressBarInAds`        | Boolean | -               | No       | false               |
+| `skipAds`                     | Boolean | -               | No       | false               |
+| `hideControls`                | Boolean | -               | No       | false               |
+| `assetType`                   | String  | -               | No       | 'VOD'               |
+| `muxId`                       | String  | -               | No       | null                |
+| `showTitle`                   | Boolean | -               | No       | null                |
+| `showPlayButtonOnPause`       | Boolean | -               | No       | true                |
+| `showShareButton`             | Boolean | -               | No       | false               |
+| `chromecastEnabled`           | Boolean | -               | No       | true                |
+| `loop`                        | Boolean | -               | No       | false               |
+| `googleAnalyticsEnabled`      | Boolean | -               | No       | false               |
+| `googleAnalyticsId`           | String  | -               | No       | null                |
 
 #### OnFullScreenData
 
@@ -140,27 +140,12 @@ export default App;
 
 #### PlayerStateData
 
-| Property    | Type   |
-|-------------|--------|
-| `state`     | String |
-| `sessionKey`| String |
+| Property    | Type                                                                                       |
+|-------------|--------------------------------------------------------------------------------------------|
+| `state`     | String [`<PlaybackState>`](https://github.com/harrymash2006/react-native-agnoplayer/tree/Create-ReadMe?tab=readme-ov-file#playbackstate) |
+| `sessionKey`| String                                                                                     |
 
-### Error Handling
-
-| Method                | Description                           |
-|-----------------------|---------------------------------------|
-| `addErrorListener`    | Add an error listener to the player   |
-| `removeErrorListener` | Remove an error listener from the player|
-| `showError`           | Show an error message                 |
-
-### Tracking Events
-
-| Event     | Description                  |
-|-----------|------------------------------|
-| `onEvent` | Triggered when an event occurs |
-| `onError` | Triggered when an error occurs |
-
-### Playback State
+### PlaybackState
 
 | State           | Description                                      |
 |-----------------|--------------------------------------------------|
@@ -169,14 +154,6 @@ export default App;
 | `STATE_BUFFERING`| The player is not able to immediately play from its current position |
 | `STATE_PLAYING` | The player is actively playing a player item     |
 | `STATE_END`     | The player has ended                             |
-
-### Integrations
-
-| Integration      | Description            |
-|------------------|------------------------|
-| `Mux tracking`   | Track events using Mux |
-| `Cim tracking`   | Track events using Cim |
-| `Gemius`         | Track events using Gemius |
 
 ### Contributing
 -------------------
