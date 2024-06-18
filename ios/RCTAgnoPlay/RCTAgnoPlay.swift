@@ -144,6 +144,7 @@ class RCTAgnoPlay: UIView {
               modifiedItem.itemTitle = playerConfig.title
               modifiedItem.playButtonBackgroundColor = playerConfig.playButtonBackgroundColor ?? "#0000FF"
               modifiedItem.showTitle = playerConfig.showTitle
+              modifiedItem.disablePIPMode = playerConfig.disablePIPMode ?? false
               
               if let url = playerConfig.posterURL.flatMap({ URL(string: $0) }) {
                   modifiedItem.posterURL = url

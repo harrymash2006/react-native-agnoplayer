@@ -32,6 +32,7 @@ struct PlayItem {
     var chromecastEnabled: Bool?
     var loop: Bool?
     var googleAnalyticsEnabled: Bool?
+    var disablePIPMode: Bool?
     var googleAnalyticsId: String?
         
     init(_ data: NSDictionary!) {
@@ -64,6 +65,7 @@ struct PlayItem {
         showShareButton = data["showShareButton"] as? Bool
         chromecastEnabled = data["chromecastEnabled"] as? Bool
         loop = data["loop"] as? Bool
+        disablePIPMode = data["disablePIPMode"] as? Bool
         googleAnalyticsEnabled = data["googleAnalyticsEnabled"] as? Bool
         googleAnalyticsId = data["googleAnalyticsId"] as? String
     }

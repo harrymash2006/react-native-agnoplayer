@@ -232,6 +232,7 @@ AgnoPlayerViewModule.propTypes = {
     loop: PropTypes.bool,
     googleAnalyticsEnabled: PropTypes.bool,
     googleAnalyticsId: PropTypes.string,
+    disablePIPMode: PropTypes.bool
   }),
   onFullScreen: PropTypes.func,
   style: PropTypes.object,
@@ -266,6 +267,7 @@ AgnoPlayerViewModule.defaultProps = {
     loop: false,
     googleAnalyticsEnabled: false,
     googleAnalyticsId: null,
+    disablePIPMode: false,
   },
 };
 

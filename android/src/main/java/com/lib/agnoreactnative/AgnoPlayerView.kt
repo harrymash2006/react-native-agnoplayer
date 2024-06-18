@@ -125,6 +125,7 @@ class AgnoPlayerView @JvmOverloads constructor(
                 }
             }
 
+        // playerItem.disablePIPMode  get PIP mode disable value here
         coroutineScope.launch {
             try {
                 val playerItemFromList =

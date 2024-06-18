@@ -22,6 +22,7 @@ export type ConfigProperties = {
     loop?: boolean;
     googleAnalyticsEnabled?: boolean;
     googleAnalyticsId?: string;
+    disablePIPMode?: boolean;
   };
 
   export type OnFullScreenData = Readonly<{

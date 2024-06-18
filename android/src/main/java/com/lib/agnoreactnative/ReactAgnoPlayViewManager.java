@@ -22,6 +22,7 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final String PROP_URL = "url";
     private static final String PROP_TITLE = "itemTitle";
     private static final String PROP_AUTOPLAY = "autoPlay";
+    private static final String PROP_DISABLEPIPMODE = "disablePIPMode";
     private static final String PROP_HIDECONTROLS = "hideControls";
 
     private static final String PROP_MUTEONAUTOPLAY = "muteOnAutoplay";
@@ -113,6 +114,7 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
         playItem.setStartOffset((long) ReactBridgeUtils.safeGetInt(playerConfig, PROP_STARTOFFSET, 0));
         playItem.setFullScreen(ReactBridgeUtils.safeGetBool(playerConfig, PROP_ISFULLSCREEN, false));
         playItem.setAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_AUTOPLAY, false));
+        playItem.setDisablePIPMode(ReactBridgeUtils.safeGetBool(playerConfig, PROP_DISABLEPIPMODE, false));
         playItem.setMuteOnAutoPlay(ReactBridgeUtils.safeGetBool(playerConfig, PROP_MUTEONAUTOPLAY, true));
         playItem.setPlaySkinColor(ReactBridgeUtils.safeGetString(playerConfig, PROP_PLAYERSKINCOLOR, null));
         playItem.setPosterURL(ReactBridgeUtils.safeGetString(playerConfig, PROP_POSTERURL, null));
