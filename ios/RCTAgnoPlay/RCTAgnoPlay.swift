@@ -19,6 +19,7 @@ class RCTAgnoPlay: UIView {
   private var _playerItem: PlayItem? = nil
   private var playerViewController: AgnoplayerViewController?
   private var _eventDispatcher:RCTEventDispatcher?
+  private var initialized = false
     
   // Events
   @objc var onFullScreen: RCTDirectEventBlock?
@@ -53,7 +54,10 @@ class RCTAgnoPlay: UIView {
   func setUrl(_ url:String) {
     _url = url
     checkAndInitializePlayer()
-      
+  }
+    
+  deinit {
+    removeFromSuperview()
   }
     
   override func removeFromSuperview() {
@@ -62,6 +66,7 @@ class RCTAgnoPlay: UIView {
       playerViewController = nil
       _eventDispatcher = nil
       NotificationCenter.default.removeObserver(self)
+      initialized = false
       super.removeFromSuperview()
   }
   
@@ -124,6 +129,10 @@ class RCTAgnoPlay: UIView {
   }
   
   func initializePlayer() {
+      if initialized {
+          return
+      }
+      
       if let playerConfig = _playerItem {
           Agnoplayer.getPlayerItem(brand: _brand,
                                    type: getAssetType(playerConfig.assetType),
@@ -212,6 +221,7 @@ class RCTAgnoPlay: UIView {
       guard let playerViewController = playerViewController else { return }
       playerViewController.view.frame = self.bounds
       addSubview(playerViewController.view)
+      initialized = true
   }
     
   func setDeviceOrientation(orientation: UIInterfaceOrientation) {

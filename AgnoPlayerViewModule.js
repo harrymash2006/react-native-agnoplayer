@@ -31,7 +31,7 @@ const AgnoPlayerViewModule = forwardRef(({ sessionKey, brand, videoId, url, show
         AgnoPlay.emitter.removeAllListeners('onPlayerStateChanged')
         AgnoPlay.emitter.removeAllListeners('onPipModeChanged')
     };
-  });
+  }, []);
 
   const onPictureInPictureChanged = (state) => {
     console.log('onPictureInPictureChanged::', state)
