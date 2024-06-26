@@ -19,6 +19,7 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     private AgnoPlayerView agnoPlayerView;
     private boolean isInBackground;
     private Activity currentActivity;
+    private boolean isInitialized;
 
     private PlayItem playerItem;
 
@@ -111,13 +112,14 @@ public class ReactAgnoPlayView extends FrameLayout implements LifecycleEventList
     }
 
     private void checkAndInitializePlayer() {
-        if (agnoPlayerView != null) {
+        if (agnoPlayerView != null && !isInitialized) {
             if (sessionKey!=null && brand!=null && (videoId!=null || url!=null) && playerItem!=null){
                 playerItem.setSessionKey(sessionKey);
                 playerItem.setBrand(brand);
                 playerItem.setVideoId(videoId);
                 playerItem.setUrl(url);
                 agnoPlayerView.initialize(playerItem, currentActivity, nativeModule);
+                isInitialized = true;
             }
         }
     }
