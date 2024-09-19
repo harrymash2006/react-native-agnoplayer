@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "15.0"
   s.source_files = "ios/RCTAgnoPlay/**/*.{h,m,swift}"
   s.dependency "React-Core"
-  s.dependency 'AgnoplayerSDK', '5.1.3'
+  s.dependency 'AgnoplayerSDK', '6.0.1'
   s.static_framework = true
   s.xcconfig = {
     'OTHER_LDFLAGS': '-ObjC',

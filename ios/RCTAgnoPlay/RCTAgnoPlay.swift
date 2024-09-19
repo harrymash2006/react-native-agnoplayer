@@ -138,13 +138,21 @@ class RCTAgnoPlay: UIView {
                                    type: getAssetType(playerConfig.assetType),
                                    id: _videoId,
                                    preferredProtocol: nil,
-                                   cimData: nil,
-                                   licenseKey: LicenseConfig.agnoplay.rawValue) { [weak self] playerItem in
+                                   cimData: nil
+          ) { [weak self] playerItem in
               guard let self = self else { return }
-              
               var modifiedItem = playerItem
               //modifiedItem.identifier = _sessionKey
               modifiedItem.loop = playerConfig.loop ?? false
+              
+              if let customPlayButton = playerConfig.customPlayButton {
+                  if customPlayButton.isEmpty {
+                      modifiedItem.customPlayButton =  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+                  } else {
+                      modifiedItem.customPlayButton = customPlayButton
+                  }
+              }
+
               modifiedItem.hideControls = playerConfig.hideControls
               modifiedItem.showShareButton = playerConfig.showShareButton ?? false
               modifiedItem.autoplay = playerConfig.autoPlay
@@ -177,11 +185,6 @@ class RCTAgnoPlay: UIView {
               print(error)
               self.playerViewController?.player?.pause()
               self.playerViewController?.player?.stop()
-              if error is LicenseError {
-                  DispatchQueue.main.async(execute: {
-                      print("licence error")
-                  })
-              }
           }
       }
       

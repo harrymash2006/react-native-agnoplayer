@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.egeniq.agno.agnoplayer.analytics.AnalyticsEventListener
 import com.egeniq.agno.agnoplayer.analytics.Event
-import com.egeniq.agno.agnoplayer.content.LicenseError
 import com.egeniq.agno.agnoplayer.data.model.AssetType
 import com.egeniq.agno.agnoplayer.data.model.PlayerItem
 import com.egeniq.agno.agnoplayer.player.AgnoErrorListener
@@ -128,11 +127,11 @@ class AgnoPlayerView @JvmOverloads constructor(
         // playerItem.disablePIPMode  get PIP mode disable value here
         coroutineScope.launch {
             try {
+
                 val playerItemFromList =
                     if (playerItem.videoId != null && playerItem.videoId?.isNotEmpty() == true) {
                         mediaPlayer?.getPlayerItem(
                             brandId = playerItem.brand.orEmpty(),
-                            licenseKey = null,
                             videoId = playerItem.videoId.orEmpty(),
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
@@ -142,7 +141,6 @@ class AgnoPlayerView @JvmOverloads constructor(
                     } else {
                         mediaPlayer?.getPlayerItemFromUrl(
                             brandId = playerItem.brand.orEmpty(),
-                            licenseKey = null,
                             videoUrl = playerItem.url.orEmpty(),
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
@@ -156,7 +154,11 @@ class AgnoPlayerView @JvmOverloads constructor(
                         hideControls = playerItem.hideControls,
                         itemTitle = playerItem.title, muteOnAutoplay = playerItem.muteOnAutoPlay,
                         playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
-                        playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
+                        customPlayButton = when {
+                            playerItem.customPlayButton == null -> null // Don't set customPlayButton if it's null
+                            playerItem.customPlayButton!!.isEmpty() -> "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" // Default value for empty string
+                            else -> playerItem.customPlayButton // Set to the provided string if it's not null or empty
+                        },                        playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
                         skipAds = playerItem.skipAds == true, muxId = playerItem.muxId, showTitle = playerItem.showTitle,
                         showPlayButtonOnPause = playerItem.showPlayButtonOnPause == true, chromecastEnabled = playerItem.chromecastEnabled,
                         loop = playerItem.loop == true)
@@ -232,11 +234,8 @@ class AgnoPlayerView @JvmOverloads constructor(
     private fun showError(error: Exception?) {
         if (error != null) {
             Log.e("showError:", error.localizedMessage)
-            if (error is LicenseError) {
-                mediaPlayer?.showError(error.errorDescription(context))
-            } else {
-                mediaPlayer?.showError()
-            }
+            mediaPlayer?.showError()
+
         }
     }
 
