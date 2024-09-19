@@ -11,6 +11,7 @@ class PlayItem {
     var url: String? = null
     var showTestAd: Boolean? = null;
     var adTag: String? = null;
+    var customPlayButton: String? = null;
     var showAds: Boolean? = null
     var skipAds: Boolean? = null
     var muteOnAutoPlay: Boolean? = null

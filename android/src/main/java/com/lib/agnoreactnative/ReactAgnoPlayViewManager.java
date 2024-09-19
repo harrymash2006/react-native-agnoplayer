@@ -28,6 +28,9 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
     private static final String PROP_MUTEONAUTOPLAY = "muteOnAutoplay";
     private static final String PROP_PLAYERSKINCOLOR = "playerSkinColor";
     private static final String PROP_PLAYBUTTONBACKGROUNDCOLOR = "playButtonBackgroundColor";
+
+    private static final String PROP_CUSTOMPLAYBUTTON = "customPlayButton";
+
     private static final String PROP_POSTERURL = "posterURL";
     private static final String PROP_HIDEPROGRESSBARINADS = "hideProgressBarInAds";
     private static final String PROP_SKIPADS = "skipAds";
@@ -119,6 +122,7 @@ public class ReactAgnoPlayViewManager extends ViewGroupManager<ReactAgnoPlayView
         playItem.setPlaySkinColor(ReactBridgeUtils.safeGetString(playerConfig, PROP_PLAYERSKINCOLOR, null));
         playItem.setPosterURL(ReactBridgeUtils.safeGetString(playerConfig, PROP_POSTERURL, null));
         playItem.setPlayButtonBackgroundColor(ReactBridgeUtils.safeGetString(playerConfig, PROP_PLAYBUTTONBACKGROUNDCOLOR, null));
+        playItem.setCustomPlayButton(ReactBridgeUtils.safeGetString(playerConfig, PROP_CUSTOMPLAYBUTTON, null));
         playItem.setHideProgressBarInAds(ReactBridgeUtils.safeGetBool(playerConfig, PROP_HIDEPROGRESSBARINADS, false));
         playItem.setSkipAds(ReactBridgeUtils.safeGetBool(playerConfig, PROP_SKIPADS, false));
         playItem.setMuxId(ReactBridgeUtils.safeGetString(playerConfig, PROP_MUXID, null));

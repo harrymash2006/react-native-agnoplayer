@@ -10,6 +10,7 @@ export type ConfigProperties = {
     adTag?:string;
     showTestAd?: boolean;
     playButtonBackgroundColor?: string;
+    customPlayButton?: string;
     hideProgressBarInAds?: boolean;
     skipAds?: boolean;
     hideControls?:boolean;

@@ -47,7 +47,7 @@ enum Config {
         }
     }
     
-
+    static var NOIMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
     enum UserDefaultsKey {
         static let environment: String = "environment"
     }

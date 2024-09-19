@@ -19,6 +19,7 @@ struct PlayItem {
     var fullScreen: Bool?
     var startOffset: Double?
     var playSkinColor: String?
+    var customPlayButton: String?
     var playButtonBackgroundColor: String?
     var autoPlay: Bool?
     var posterURL: String?
@@ -48,6 +49,7 @@ struct PlayItem {
         url = data["url"] as? String
         showTestAd = data["showTestAd"] as? Bool
         adTag = data["adTag"] as? String
+        customPlayButton = data["customPlayButton"] as? String
         showAds = data["showAds"] as? Bool
         hideControls = data["hideControls"] as? Bool
         skipAds = data["skipAds"] as? Bool
