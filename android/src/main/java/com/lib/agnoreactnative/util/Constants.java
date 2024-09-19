@@ -3,6 +3,7 @@ public class Constants {
     public static final String DEFAULT_BRAND_ID = "agnoplay";
     public static final String DEFAULT_VIDEO_ID = "Mbdskc9KsAii";
     public static final String DEFAULT_VIDEO_URL = "https://storage.googleapis.com/exoplayer-test-media-1/60fps/bbb-clear-1080/manifest.mpd";
+    public static final String NOIMAGE = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
 
     public static class LicenseKey {
         public static final String ACC = "0fb566bd-a23f-457b-90c2-00a81be1e7ac";

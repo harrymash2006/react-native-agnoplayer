@@ -156,7 +156,7 @@ class AgnoPlayerView @JvmOverloads constructor(
                         playerSkinColor = playerItem.playSkinColor, posterURL = playerItem.posterURL,
                         customPlayButton = when {
                             playerItem.customPlayButton == null -> null // Don't set customPlayButton if it's null
-                            playerItem.customPlayButton!!.isEmpty() -> "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" // Default value for empty string
+                            playerItem.customPlayButton!!.isEmpty() -> Constants.NOIMAGE // Default value for empty string
                             else -> playerItem.customPlayButton // Set to the provided string if it's not null or empty
                         },                        playButtonBackgroundColor = playerItem.playButtonBackgroundColor, hideProgressBarInAds = playerItem.hideProgressBarInAds == true,
                         skipAds = playerItem.skipAds == true, muxId = playerItem.muxId, showTitle = playerItem.showTitle,

@@ -147,7 +147,7 @@ class RCTAgnoPlay: UIView {
               
               if let customPlayButton = playerConfig.customPlayButton {
                   if customPlayButton.isEmpty {
-                      modifiedItem.customPlayButton =  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+                      modifiedItem.customPlayButton =  Config.NOIMAGE
                   } else {
                       modifiedItem.customPlayButton = customPlayButton
                   }
