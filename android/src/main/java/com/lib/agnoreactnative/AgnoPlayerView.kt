@@ -136,6 +136,7 @@ class AgnoPlayerView @JvmOverloads constructor(
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
                             advertTag = advertTag,
+                            licenseKey = null,
                             type = getAssetType(playerItem.assetType)
                         )
                     } else {
@@ -144,7 +145,8 @@ class AgnoPlayerView @JvmOverloads constructor(
                             videoUrl = playerItem.url.orEmpty(),
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
-                            type = getAssetType(playerItem.assetType)
+                            licenseKey = null,
+                            type = getAssetType(playerItem.assetType),
                         )
                     }.also { item ->
                         item?.showShareButton = playerItem.showShareButton == true
@@ -369,7 +371,7 @@ class AgnoPlayerView @JvmOverloads constructor(
     override fun onEvent(event: Event, playerItemHolder: PlayerItemHolder) {
         println("onEvent::"+ event.name)
         println("playerItemHolder::"+ playerItemHolder.playerItem?.identifier)
-        if (playerItemHolder.playerItem?.identifier == sessionKey && (event.name == "ended" || event.name == "100-percent")) {
+        if (playerItemHolder.playerItem?.identifier == sessionKey && (event.name == "ended"/* || event.name == "100-percent"*/)) {
             onPlayerStateUpdate(4)
         }
     }
