@@ -1,13 +1,13 @@
 {
   "name": "react-native-agnoplayer",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "React Native AgnoPlayer API for iOS & Android",
   "main": "index.js",
   "typings": "./index.d.ts",
   "types": "index.d.ts",
   "files": [
     "/android",
-    "src",
+    "/src",
     "!/android/build",
     "/ios",
     "/lib",
