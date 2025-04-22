@@ -136,7 +136,6 @@ class AgnoPlayerView @JvmOverloads constructor(
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
                             advertTag = advertTag,
-                            licenseKey = null,
                             type = getAssetType(playerItem.assetType)
                         )
                     } else {
@@ -145,7 +144,6 @@ class AgnoPlayerView @JvmOverloads constructor(
                             videoUrl = playerItem.url.orEmpty(),
                             preferredProtocol = null,
                             playAd = playerItem.showAds == true,
-                            licenseKey = null,
                             type = getAssetType(playerItem.assetType),
                         )
                     }.also { item ->
